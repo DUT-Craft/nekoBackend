@@ -3,56 +3,90 @@ package top.foxball.nekobackend.datasource.jdbc
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
-@Table(name = "user")
+/** 用户账号实体，对应系统用户基础资料、封禁信息和权限关系。 */
 @Entity
+@Table(name = "users")
 class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     var id: Long? = null,
 
-    /** 用户名，唯一约束，不允许为空 */
-    @Column(name = "username", nullable = false, unique = true)
-    var username: String? = null,
+    /** 用户名，唯一且不能为空。 */
+    @Column(name = "username", nullable = false, unique = true, length = 64)
+    var username: String,
 
-    /** 密码，不允许为空 */
-    @Column(name = "password", nullable = false)
-    var password: String? = null,
+    /** 加密后的登录密码，不能为空。 */
+    @Column(name = "password", nullable = false, length = 255)
+    var password: String,
 
-    /** 邮箱地址，唯一约束，不允许为空 */
-    @Column(name = "email", nullable = false, unique = true)
+    /** 邮箱地址，唯一且不能为空。 */
+    @Column(name = "email", nullable = false, unique = true, length = 128)
     var email: String,
 
-    /** 昵称，不允许为空 */
-    @Column(name = "nickname", nullable = false)
-    var nickname: String? = null,
+    /** 用户昵称，不能为空。 */
+    @Column(name = "nickname", nullable = false, length = 64)
+    var nickname: String = "Neko",
 
-    /** 注册时间，不允许为空 */
+    /** 注册时间，不能为空。 */
     @Column(name = "register_time", nullable = false)
     var registerTime: LocalDateTime? = null,
 
-    /** 用户状态（ACTIVE-活跃，BANNED-禁用） */
-    @Column(name = "status", nullable = false)
+    /** 用户状态，ACTIVE 表示正常，BANNED 表示已封禁。 */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 16)
     var status: Status? = Status.ACTIVE,
 
+    /** 封禁原因，未封禁时为空。 */
     @Column(name = "ban_reason", length = 255)
     var banReason: String? = null,
 
+    /** 封禁时间，未封禁时为空。 */
     @Column(name = "banned_at")
     var bannedAt: LocalDateTime? = null,
 
+    /** 执行封禁操作的用户 ID，未封禁或系统操作时为空。 */
     @Column(name = "banned_by_user_id")
     var bannedByUserId: Long? = null,
 
-    /** 个性签名，可为空 */
-    @Column(name = "signature", nullable = true)
+    /** 个性签名，可以为空。 */
+    @Column(name = "signature", length = 255)
     var signature: String? = null,
 
-    /** 头像 URL，可为空，默认使用系统默认头像 */
-    @Column(name = "avatar", nullable = true)
+    /** 头像 URL，可以为空，默认使用系统默认头像。 */
+    @Column(name = "avatar", length = 255)
     var avatar: String? = "https://cdn.jsdelivr.net/gh/sakuranoki/cdn/img/avatar/default.png",
 
-    /** 角色列表 */
+    /** 学号，可以为空。 */
+    @Column(name = "student_id", length = 64)
+    var studentId: String? = null,
+
+    /** 年级，可以为空。 */
+    @Column(name = "grade", length = 32)
+    var grade: String? = null,
+
+    /** 班级名称，可以为空。 */
+    @Column(name = "class_name", length = 64)
+    var className: String? = null,
+
+    /** 专业名称，可以为空。 */
+    @Column(name = "major", length = 128)
+    var major: String? = null,
+
+    /** 手机号，可以为空。 */
+    @Column(name = "phone", length = 32)
+    var phone: String? = null,
+
+    /** 其他联系方式列表，可以为空。 */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "user_contact_information",
+        joinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")],
+    )
+    @Column(name = "contact_information", length = 128)
+    var contactInformation: MutableList<String>? = null,
+
+    /** 角色列表。 */
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_role",
@@ -61,7 +95,7 @@ class User(
     )
     var roles: MutableSet<Role> = mutableSetOf(),
 
-    /** 权限列表 */
+    /** 直接授予用户的权限列表。 */
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_permission",
@@ -69,9 +103,13 @@ class User(
         inverseJoinColumns = [JoinColumn(name = "permission_id", referencedColumnName = "id")],
     )
     var permissions: MutableSet<Permission> = mutableSetOf(),
+)
 
-    )
-
+/** 用户账号状态。 */
 enum class Status {
-    ACTIVE, BANNED
+    /** 正常可用。 */
+    ACTIVE,
+
+    /** 已被封禁。 */
+    BANNED
 }
