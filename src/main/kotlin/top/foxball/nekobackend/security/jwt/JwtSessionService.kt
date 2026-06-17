@@ -12,6 +12,10 @@ class JwtSessionService(
     private val jwtProperties: JwtProperties,
 ) {
 
+    companion object {
+        private const val MAX_USER_TOKENS = 3L
+    }
+
     /** 登录成功后写入 Redis，会话数据包含 token、用户 ID 和 User-Agent。 */
     fun save(
         token: String,
@@ -28,15 +32,16 @@ class JwtSessionService(
         )
 
         stringRedisTemplate.opsForValue().set(tokenKey, JSON.toJSONString(session), ttl)
-        stringRedisTemplate.opsForSet().add(userTokensKey, token)
+        stringRedisTemplate.opsForZSet().add(userTokensKey, token, System.currentTimeMillis().toDouble())
         stringRedisTemplate.expire(userTokensKey, ttl)
+        trimUserTokens(userTokensKey)
     }
 
     /** 每次请求都检查 token 是否仍在 Redis 中，并校验 User-Agent 和用户 ID。 */
     fun validate(
         token: String,
         userId: Long,
-        userAgent: String?,
+        userAgent: String,
     ) {
         val sessionJson = stringRedisTemplate.opsForValue().get(tokenKey(token))
             ?: throw TokenInvalidException()
@@ -61,13 +66,28 @@ class JwtSessionService(
     /** 修改密码后撤销该用户当前保存的全部 token。 */
     fun revokeAll(userId: Long) {
         val userTokensKey = userTokensKey(userId)
-        val tokens = stringRedisTemplate.opsForSet().members(userTokensKey).orEmpty()
+        val tokens = stringRedisTemplate.opsForZSet().range(userTokensKey, 0, -1).orEmpty()
         val tokenKeys = tokens.map { tokenKey(it) }
 
         if (tokenKeys.isNotEmpty()) {
             stringRedisTemplate.delete(tokenKeys)
         }
         stringRedisTemplate.delete(userTokensKey)
+    }
+
+    /** 每个用户最多保留 3 个 token，超过后删除最早生成的 token。 */
+    private fun trimUserTokens(userTokensKey: String) {
+        val tokenCount = stringRedisTemplate.opsForZSet().zCard(userTokensKey) ?: return
+        val overflow = tokenCount - MAX_USER_TOKENS
+        if (overflow <= 0) return
+
+        val tokensToRevoke = stringRedisTemplate.opsForZSet()
+            .range(userTokensKey, 0, overflow - 1)
+            .orEmpty()
+        if (tokensToRevoke.isEmpty()) return
+
+        stringRedisTemplate.delete(tokensToRevoke.map { tokenKey(it) })
+        stringRedisTemplate.opsForZSet().remove(userTokensKey, *tokensToRevoke.toTypedArray())
     }
 
     /** 统一规范化 User-Agent，避免空值和前后空白造成误判。 */

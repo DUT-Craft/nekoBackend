@@ -47,5 +47,5 @@ data class ChangePasswordResponse(
 interface AuthService {
     fun register(request: RegisterRequest): RegisterResponse
     fun changePassword(userId: Long, request: ChangePasswordRequest): ChangePasswordResponse
-    fun login(request: LoginRequest, userAgent: String?): LoginResponse
+    fun login(request: LoginRequest, userAgent: String): LoginResponse
 }

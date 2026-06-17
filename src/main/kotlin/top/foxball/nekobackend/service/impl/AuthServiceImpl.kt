@@ -13,15 +13,7 @@ import top.foxball.nekobackend.security.NekoUserDetailsService
 import top.foxball.nekobackend.security.jwt.JwtProperties
 import top.foxball.nekobackend.security.jwt.JwtSessionService
 import top.foxball.nekobackend.security.jwt.JwtTokenService
-import top.foxball.nekobackend.service.AuthService
-import top.foxball.nekobackend.service.ChangePasswordRequest
-import top.foxball.nekobackend.service.ChangePasswordResponse
-import top.foxball.nekobackend.service.LoginRequest
-import top.foxball.nekobackend.service.LoginResponse
-import top.foxball.nekobackend.service.LoginUserResponse
-import top.foxball.nekobackend.service.RegisterRequest
-import top.foxball.nekobackend.service.RegisterResponse
-import top.foxball.nekobackend.service.UserService
+import top.foxball.nekobackend.service.*
 
 @Service
 class AuthServiceImpl(
@@ -78,7 +70,7 @@ class AuthServiceImpl(
         return ChangePasswordResponse(changed = true)
     }
 
-    override fun login(request: LoginRequest, userAgent: String?): LoginResponse {
+    override fun login(request: LoginRequest, userAgent: String): LoginResponse {
         if (request.username.isBlank() || request.password.isBlank()) {
             throw UsernameOrPasswordErrorException()
         }

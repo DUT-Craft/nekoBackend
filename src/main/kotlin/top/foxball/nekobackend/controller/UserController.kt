@@ -30,8 +30,8 @@ class UserController(
 
         val rs = user?.let {
             Response(
-                username = it.username!!,
-                nickname = user.nickname!!,
+                username = it.username,
+                nickname = user.nickname,
                 avatar = user.avatar!!,
                 signature = user.signature!!
             )
