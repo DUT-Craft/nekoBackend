@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -42,6 +43,12 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
+        val userAgent = request.getHeader(HttpHeaders.USER_AGENT)
+        if (requiresUserAgent(request) && userAgent.isNullOrBlank()) {
+            writeError(response, HttpStatus.BAD_REQUEST.value(), "User-Agent 不能为空")
+            return
+        }
+
         val authorization = request.getHeader(HttpHeaders.AUTHORIZATION)
 
         if (authorization.isNullOrBlank() || !authorization.startsWith("Bearer ")) {
@@ -55,7 +62,7 @@ class JwtAuthenticationFilter(
             jwtSessionService.validate(
                 token = token,
                 userId = claims.userId,
-                userAgent = request.getHeader(HttpHeaders.USER_AGENT),
+                userAgent = userAgent,
             )
 
             if (SecurityContextHolder.getContext().authentication == null) {
@@ -83,6 +90,18 @@ class JwtAuthenticationFilter(
             val tokenInvalid = TokenInvalidException()
             writeError(response, tokenInvalid.code, tokenInvalid.message)
         }
+    }
+
+    /** 登录接口和非放行接口必须携带 User-Agent；注册、健康检查和预检请求不强制。 */
+    private fun requiresUserAgent(request: HttpServletRequest): Boolean {
+        if (HttpMethod.OPTIONS.matches(request.method)) return false
+
+        val path = request.servletPath
+        if (path == "/api/auth/login") return true
+
+        return path != "/api/auth/register" &&
+            path != "/actuator/info" &&
+            !path.startsWith("/actuator/health")
     }
 
     /** 统一输出 JSON 格式的认证错误。 */

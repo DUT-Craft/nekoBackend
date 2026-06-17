@@ -41,7 +41,7 @@ class JwtSessionService(
     fun validate(
         token: String,
         userId: Long,
-        userAgent: String,
+        userAgent: String?,
     ) {
         val sessionJson = stringRedisTemplate.opsForValue().get(tokenKey(token))
             ?: throw TokenInvalidException()
@@ -92,7 +92,8 @@ class JwtSessionService(
 
     /** 统一规范化 User-Agent，避免空值和前后空白造成误判。 */
     private fun normalizeUserAgent(userAgent: String?): String {
-        return userAgent?.trim()?.takeIf { it.isNotBlank() } ?: "UNKNOWN"
+        return userAgent?.trim()?.takeIf { it.isNotBlank() }
+            ?: throw TokenInvalidException("User-Agent 不能为空")
     }
 
     /** 单个 token 的 Redis key。 */

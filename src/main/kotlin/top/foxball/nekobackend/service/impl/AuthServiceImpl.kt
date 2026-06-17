@@ -74,6 +74,9 @@ class AuthServiceImpl(
         if (request.username.isBlank() || request.password.isBlank()) {
             throw UsernameOrPasswordErrorException()
         }
+        if (userAgent.isBlank()) {
+            throw ParamErrorException("User-Agent 不能为空")
+        }
 
         val principal = try {
             userDetailsService.loadUserByUsername(request.username.trim()) as AuthPrincipal
@@ -98,7 +101,7 @@ class AuthServiceImpl(
         jwtSessionService.save(
             token = accessToken,
             userId = principal.userId,
-            userAgent = userAgent,
+            userAgent = userAgent.trim(),
         )
 
         return LoginResponse(
