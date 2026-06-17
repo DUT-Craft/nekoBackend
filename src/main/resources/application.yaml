@@ -1,0 +1,77 @@
+server:
+  port: 8020
+
+
+management:
+  endpoint:
+    health:
+      show-components: always
+      show-details: always
+    info:
+      enabled: true
+    metrics:
+      enabled: true
+  info:
+    env:
+      enabled: true
+    java:
+      enabled: true
+    os:
+      enabled: true
+    process:
+      enabled: true
+  metrics:
+    enable:
+      executor: true
+      hikaricp: true
+      jdbc: true
+      jvm: true
+      logback: true
+      process: true
+      rabbitmq: true
+      system: true
+  endpoints:
+    web:
+      exposure:
+        # 对外暴露的 Actuator 端点列表
+        include:
+          # 健康检查端点
+          - health
+          # 指标采集端点
+          - metrics
+          # 应用信息端点
+          - info
+          # 配置刷新端点
+          - refresh
+
+spring:
+  application:
+    name: NekoBackend
+  datasource:
+    url: jdbc:postgresql://100.91.251.36:5432/backend
+    username: backend
+    password: hSxcEnNjDDFxppms
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      connection-timeout: 2000
+
+  jpa:
+    hibernate:
+      ddl-auto: none  # 每次启动时重新创建表结构
+    show-sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+  data:
+    redis:
+      port: 6379
+      password: redis_YH22Ad
+      database: 4
+      timeout: 10000ms
+      host: 100.91.251.36
