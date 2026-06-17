@@ -7,7 +7,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.core.RedisTemplate
 
 @Configuration
-class RedisTemplate {
+class RedisTemplateConfig {
     @Bean
     fun redisTemplate(redisConnectionFactory: RedisConnectionFactory?): RedisTemplate<*, *> {
         val redisTemplate: RedisTemplate<*, *> = RedisTemplate<Any?, Any?>()

@@ -48,17 +48,18 @@ spring:
   application:
     name: NekoBackend
   datasource:
-    url: jdbc:postgresql://100.91.251.36:5432/backend
-    username: backend
-    password: hSxcEnNjDDFxppms
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
       connection-timeout: 2000
-
+  config:
+    import: optional:file:.env[.properties]
   jpa:
     hibernate:
-      ddl-auto: none  # 每次启动时重新创建表结构
+      ddl-auto: create  # 每次启动时重新创建表结构
     show-sql: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
@@ -68,10 +69,11 @@ spring:
           batch_size: 20
         order_inserts: true
         order_updates: true
+
   data:
     redis:
-      port: 6379
-      password: redis_YH22Ad
-      database: 4
-      timeout: 10000ms
-      host: 100.91.251.36
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      database: ${REDIS_DATABASE:4}
+      timeout: ${REDIS_TIMEOUT:10000ms}
