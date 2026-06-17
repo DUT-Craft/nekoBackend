@@ -1,11 +1,6 @@
 package top.foxball.nekobackend.datasource.jdbc
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "role")
@@ -15,6 +10,20 @@ data class Role(
     @Column(name = "id")
     var id: Long? = null,
 
-    @Column(name = "name")
-    var name: String? = "user",
+    @Column(name = "code", nullable = false, unique = true, length = 64)
+    var code: String? = null,
+
+    @Column(name = "name", nullable = false, length = 64)
+    var name: String? = null,
+
+    @Column(name = "description", length = 255)
+    var description: String? = null,
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "role_permission",
+        joinColumns = [JoinColumn(name = "role_id", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "permission_id", referencedColumnName = "id")],
+    )
+    var permissions: MutableSet<Permission> = mutableSetOf(),
 )

@@ -52,7 +52,7 @@ class User(
     @Column(name = "avatar", nullable = true)
     var avatar: String? = "https://cdn.jsdelivr.net/gh/sakuranoki/cdn/img/avatar/default.png",
 
-    /** 权限列表 */
+    /** 角色列表 */
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_role",
@@ -60,6 +60,15 @@ class User(
         inverseJoinColumns = [JoinColumn(name = "role_id", referencedColumnName = "id")],
     )
     var roles: MutableSet<Role> = mutableSetOf(),
+
+    /** 权限列表 */
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_permission",
+        joinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "permission_id", referencedColumnName = "id")],
+    )
+    var permissions: MutableSet<Permission> = mutableSetOf(),
 
     )
 
