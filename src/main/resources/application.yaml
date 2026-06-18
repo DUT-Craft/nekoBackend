@@ -7,6 +7,16 @@ security:
     issuer: ${JWT_ISSUER:NekoBackend}
     access-token-ttl-seconds: ${JWT_ACCESS_TOKEN_TTL_SECONDS:7200}
 
+neko:
+  okhttp:
+    connect-timeout: ${OKHTTP_CONNECT_TIMEOUT:5s}
+    read-timeout: ${OKHTTP_READ_TIMEOUT:15s}
+    write-timeout: ${OKHTTP_WRITE_TIMEOUT:15s}
+    call-timeout: ${OKHTTP_CALL_TIMEOUT:30s}
+    max-idle-connections: ${OKHTTP_MAX_IDLE_CONNECTIONS:20}
+    keep-alive-duration: ${OKHTTP_KEEP_ALIVE_DURATION:5m}
+    retry-on-connection-failure: ${OKHTTP_RETRY_ON_CONNECTION_FAILURE:true}
+
 management:
   endpoint:
     health:

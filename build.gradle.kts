@@ -41,6 +41,7 @@ configurations.configureEach {
 }
 
 val fastjson2Version = "2.0.61"
+val okhttpVersion = "5.4.0"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -56,6 +57,8 @@ dependencies {
     implementation("org.springframework.security:spring-security-webauthn")
     implementation("com.alibaba.fastjson2:fastjson2:$fastjson2Version")
     implementation("com.alibaba.fastjson2:fastjson2-extension-spring6:$fastjson2Version")
+    implementation(platform("com.squareup.okhttp3:okhttp-bom:$okhttpVersion"))
+    implementation("com.squareup.okhttp3:okhttp")
 
 
 
