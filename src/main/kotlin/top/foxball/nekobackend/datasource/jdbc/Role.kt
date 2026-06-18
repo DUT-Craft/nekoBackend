@@ -27,3 +27,4 @@ data class Role(
     )
     var permissions: MutableSet<Permission> = mutableSetOf(),
 )
+
