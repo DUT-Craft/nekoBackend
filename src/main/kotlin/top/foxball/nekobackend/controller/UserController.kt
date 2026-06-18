@@ -3,7 +3,6 @@ package top.foxball.nekobackend.controller
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
-import top.foxball.nekobackend.datasource.jdbc.User
 import top.foxball.nekobackend.handlder.ParamErrorException
 import top.foxball.nekobackend.handlder.UserNotFoundException
 import top.foxball.nekobackend.security.AuthPrincipal
@@ -70,28 +69,42 @@ class UserController(
         }
 
         val savedUser = userService.save(user)
-        return builder.ok().data(toUserInfoResponse(savedUser)).build()
+
+        data class Response(
+            val id: Long?,
+            val username: String,
+            val email: String,
+            val nickname: String,
+            val avatar: String?,
+            val signature: String?,
+            val studentId: String?,
+            val grade: String?,
+            val className: String?,
+            val major: String?,
+            val phone: String?,
+            val contactInformation: List<String>,
+        )
+
+        val rs = Response(
+            id = savedUser.id,
+            username = savedUser.username,
+            email = savedUser.email,
+            nickname = savedUser.nickname,
+            avatar = savedUser.avatar,
+            signature = savedUser.signature,
+            studentId = savedUser.studentId,
+            grade = savedUser.grade,
+            className = savedUser.className,
+            major = savedUser.major,
+            phone = savedUser.phone,
+            contactInformation = savedUser.contactInformation ?: emptyList(),
+        )
+
+        return builder.ok().data(rs).build()
     }
 
     private fun normalizeNullableText(value: String): String? {
         return value.trim().ifBlank { null }
-    }
-
-    private fun toUserInfoResponse(user: User): UserInfoResponse {
-        return UserInfoResponse(
-            id = user.id,
-            username = user.username,
-            email = user.email,
-            nickname = user.nickname,
-            avatar = user.avatar,
-            signature = user.signature,
-            studentId = user.studentId,
-            grade = user.grade,
-            className = user.className,
-            major = user.major,
-            phone = user.phone,
-            contactInformation = user.contactInformation ?: emptyList(),
-        )
     }
 }
 
@@ -105,19 +118,4 @@ data class UpdateUserInfoRequest(
     val major: String? = null,
     val phone: String? = null,
     val contactInformation: List<String>? = null,
-)
-
-data class UserInfoResponse(
-    val id: Long?,
-    val username: String,
-    val email: String,
-    val nickname: String,
-    val avatar: String?,
-    val signature: String?,
-    val studentId: String?,
-    val grade: String?,
-    val className: String?,
-    val major: String?,
-    val phone: String?,
-    val contactInformation: List<String>,
 )

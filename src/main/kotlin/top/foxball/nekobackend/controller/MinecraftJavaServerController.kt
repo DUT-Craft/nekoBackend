@@ -12,6 +12,7 @@ import top.foxball.nekobackend.service.MinecraftJavaServerStatusUpdateRequest
 import top.foxball.nekobackend.service.MinecraftJavaServerUpdateRequest
 import top.foxball.nekobackend.shared.Response
 import top.foxball.nekobackend.shared.ResponseBuilder
+import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/api/minecraft/java/servers")
@@ -26,10 +27,53 @@ class MinecraftJavaServerController(
         @RequestBody request: MinecraftJavaServerCreateRequest,
     ): ResponseEntity<Response> {
         val principal = authentication.principal as AuthPrincipal
+        val server = minecraftJavaServerService.create(principal.userId, request)
 
-        return builder.ok()
-            .data(minecraftJavaServerService.create(principal.userId, request))
-            .build()
+        data class Response(
+            val id: Long?,
+            val userId: Long?,
+            val name: String?,
+            val description: String?,
+            val version: String?,
+            val serverType: MinecraftJavaServerType?,
+            val status: MinecraftJavaServerStatus?,
+            val address: String?,
+            val port: Int?,
+            val motd: String?,
+            val maxPlayers: Int?,
+            val onlineMode: Boolean?,
+            val whitelistEnabled: Boolean?,
+            val iconUrl: String?,
+            val virtualMachineId: Long?,
+            val lastCheckedAt: LocalDateTime?,
+            val createdAt: LocalDateTime?,
+            val updatedAt: LocalDateTime?,
+            val remark: String?,
+        )
+
+        val rs = Response(
+            id = server.id,
+            userId = server.userId,
+            name = server.name,
+            description = server.description,
+            version = server.version,
+            serverType = server.serverType,
+            status = server.status,
+            address = server.address,
+            port = server.port,
+            motd = server.motd,
+            maxPlayers = server.maxPlayers,
+            onlineMode = server.onlineMode,
+            whitelistEnabled = server.whitelistEnabled,
+            iconUrl = server.iconUrl,
+            virtualMachineId = server.virtualMachineId,
+            lastCheckedAt = server.lastCheckedAt,
+            createdAt = server.createdAt,
+            updatedAt = server.updatedAt,
+            remark = server.remark,
+        )
+
+        return builder.ok().data(rs).build()
     }
 
     @GetMapping
@@ -40,17 +84,60 @@ class MinecraftJavaServerController(
         @RequestParam(required = false) status: MinecraftJavaServerStatus?,
     ): ResponseEntity<Response> {
         val principal = authentication.principal as AuthPrincipal
+        val servers = minecraftJavaServerService.findMine(
+            userId = principal.userId,
+            version = version,
+            serverType = serverType,
+            status = status,
+        )
 
-        return builder.ok()
-            .data(
-                minecraftJavaServerService.findMine(
-                    userId = principal.userId,
-                    version = version,
-                    serverType = serverType,
-                    status = status,
-                )
+        data class Response(
+            val id: Long?,
+            val userId: Long?,
+            val name: String?,
+            val description: String?,
+            val version: String?,
+            val serverType: MinecraftJavaServerType?,
+            val status: MinecraftJavaServerStatus?,
+            val address: String?,
+            val port: Int?,
+            val motd: String?,
+            val maxPlayers: Int?,
+            val onlineMode: Boolean?,
+            val whitelistEnabled: Boolean?,
+            val iconUrl: String?,
+            val virtualMachineId: Long?,
+            val lastCheckedAt: LocalDateTime?,
+            val createdAt: LocalDateTime?,
+            val updatedAt: LocalDateTime?,
+            val remark: String?,
+        )
+
+        val rs = servers.map {
+            Response(
+                id = it.id,
+                userId = it.userId,
+                name = it.name,
+                description = it.description,
+                version = it.version,
+                serverType = it.serverType,
+                status = it.status,
+                address = it.address,
+                port = it.port,
+                motd = it.motd,
+                maxPlayers = it.maxPlayers,
+                onlineMode = it.onlineMode,
+                whitelistEnabled = it.whitelistEnabled,
+                iconUrl = it.iconUrl,
+                virtualMachineId = it.virtualMachineId,
+                lastCheckedAt = it.lastCheckedAt,
+                createdAt = it.createdAt,
+                updatedAt = it.updatedAt,
+                remark = it.remark,
             )
-            .build()
+        }
+
+        return builder.ok().data(rs).build()
     }
 
     @GetMapping("/{id}")
@@ -59,10 +146,53 @@ class MinecraftJavaServerController(
         @PathVariable id: Long,
     ): ResponseEntity<Response> {
         val principal = authentication.principal as AuthPrincipal
+        val server = minecraftJavaServerService.findById(principal.userId, id)
 
-        return builder.ok()
-            .data(minecraftJavaServerService.findById(principal.userId, id))
-            .build()
+        data class Response(
+            val id: Long?,
+            val userId: Long?,
+            val name: String?,
+            val description: String?,
+            val version: String?,
+            val serverType: MinecraftJavaServerType?,
+            val status: MinecraftJavaServerStatus?,
+            val address: String?,
+            val port: Int?,
+            val motd: String?,
+            val maxPlayers: Int?,
+            val onlineMode: Boolean?,
+            val whitelistEnabled: Boolean?,
+            val iconUrl: String?,
+            val virtualMachineId: Long?,
+            val lastCheckedAt: LocalDateTime?,
+            val createdAt: LocalDateTime?,
+            val updatedAt: LocalDateTime?,
+            val remark: String?,
+        )
+
+        val rs = Response(
+            id = server.id,
+            userId = server.userId,
+            name = server.name,
+            description = server.description,
+            version = server.version,
+            serverType = server.serverType,
+            status = server.status,
+            address = server.address,
+            port = server.port,
+            motd = server.motd,
+            maxPlayers = server.maxPlayers,
+            onlineMode = server.onlineMode,
+            whitelistEnabled = server.whitelistEnabled,
+            iconUrl = server.iconUrl,
+            virtualMachineId = server.virtualMachineId,
+            lastCheckedAt = server.lastCheckedAt,
+            createdAt = server.createdAt,
+            updatedAt = server.updatedAt,
+            remark = server.remark,
+        )
+
+        return builder.ok().data(rs).build()
     }
 
     @PutMapping("/{id}")
@@ -72,10 +202,53 @@ class MinecraftJavaServerController(
         @RequestBody request: MinecraftJavaServerUpdateRequest,
     ): ResponseEntity<Response> {
         val principal = authentication.principal as AuthPrincipal
+        val server = minecraftJavaServerService.update(principal.userId, id, request)
 
-        return builder.ok()
-            .data(minecraftJavaServerService.update(principal.userId, id, request))
-            .build()
+        data class Response(
+            val id: Long?,
+            val userId: Long?,
+            val name: String?,
+            val description: String?,
+            val version: String?,
+            val serverType: MinecraftJavaServerType?,
+            val status: MinecraftJavaServerStatus?,
+            val address: String?,
+            val port: Int?,
+            val motd: String?,
+            val maxPlayers: Int?,
+            val onlineMode: Boolean?,
+            val whitelistEnabled: Boolean?,
+            val iconUrl: String?,
+            val virtualMachineId: Long?,
+            val lastCheckedAt: LocalDateTime?,
+            val createdAt: LocalDateTime?,
+            val updatedAt: LocalDateTime?,
+            val remark: String?,
+        )
+
+        val rs = Response(
+            id = server.id,
+            userId = server.userId,
+            name = server.name,
+            description = server.description,
+            version = server.version,
+            serverType = server.serverType,
+            status = server.status,
+            address = server.address,
+            port = server.port,
+            motd = server.motd,
+            maxPlayers = server.maxPlayers,
+            onlineMode = server.onlineMode,
+            whitelistEnabled = server.whitelistEnabled,
+            iconUrl = server.iconUrl,
+            virtualMachineId = server.virtualMachineId,
+            lastCheckedAt = server.lastCheckedAt,
+            createdAt = server.createdAt,
+            updatedAt = server.updatedAt,
+            remark = server.remark,
+        )
+
+        return builder.ok().data(rs).build()
     }
 
     @PatchMapping("/{id}/status")
@@ -85,10 +258,53 @@ class MinecraftJavaServerController(
         @RequestBody request: MinecraftJavaServerStatusUpdateRequest,
     ): ResponseEntity<Response> {
         val principal = authentication.principal as AuthPrincipal
+        val server = minecraftJavaServerService.updateStatus(principal.userId, id, request)
 
-        return builder.ok()
-            .data(minecraftJavaServerService.updateStatus(principal.userId, id, request))
-            .build()
+        data class Response(
+            val id: Long?,
+            val userId: Long?,
+            val name: String?,
+            val description: String?,
+            val version: String?,
+            val serverType: MinecraftJavaServerType?,
+            val status: MinecraftJavaServerStatus?,
+            val address: String?,
+            val port: Int?,
+            val motd: String?,
+            val maxPlayers: Int?,
+            val onlineMode: Boolean?,
+            val whitelistEnabled: Boolean?,
+            val iconUrl: String?,
+            val virtualMachineId: Long?,
+            val lastCheckedAt: LocalDateTime?,
+            val createdAt: LocalDateTime?,
+            val updatedAt: LocalDateTime?,
+            val remark: String?,
+        )
+
+        val rs = Response(
+            id = server.id,
+            userId = server.userId,
+            name = server.name,
+            description = server.description,
+            version = server.version,
+            serverType = server.serverType,
+            status = server.status,
+            address = server.address,
+            port = server.port,
+            motd = server.motd,
+            maxPlayers = server.maxPlayers,
+            onlineMode = server.onlineMode,
+            whitelistEnabled = server.whitelistEnabled,
+            iconUrl = server.iconUrl,
+            virtualMachineId = server.virtualMachineId,
+            lastCheckedAt = server.lastCheckedAt,
+            createdAt = server.createdAt,
+            updatedAt = server.updatedAt,
+            remark = server.remark,
+        )
+
+        return builder.ok().data(rs).build()
     }
 
     @DeleteMapping("/{id}")
@@ -99,8 +315,14 @@ class MinecraftJavaServerController(
         val principal = authentication.principal as AuthPrincipal
         minecraftJavaServerService.delete(principal.userId, id)
 
-        return builder.ok()
-            .data(mapOf("deleted" to true))
-            .build()
+        data class Response(
+            val deleted: Boolean,
+        )
+
+        val rs = Response(
+            deleted = true,
+        )
+
+        return builder.ok().data(rs).build()
     }
 }

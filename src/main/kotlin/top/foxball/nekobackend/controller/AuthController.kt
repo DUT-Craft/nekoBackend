@@ -21,16 +21,56 @@ class AuthController(
         @RequestBody request: LoginRequest,
         @RequestHeader(HttpHeaders.USER_AGENT, required = true) userAgent: String,
     ): ResponseEntity<Response> {
-        return builder.ok()
-            .data(authService.login(request, userAgent))
-            .build()
+        val login = authService.login(request, userAgent)
+
+        data class UserResponse(
+            val id: Long,
+            val username: String,
+            val authorities: List<String>,
+        )
+
+        data class Response(
+            val tokenType: String,
+            val accessToken: String,
+            val expiresIn: Long,
+            val user: UserResponse,
+        )
+
+        val rs = Response(
+            tokenType = login.tokenType,
+            accessToken = login.accessToken,
+            expiresIn = login.expiresIn,
+            user = UserResponse(
+                id = login.user.id,
+                username = login.user.username,
+                authorities = login.user.authorities,
+            ),
+        )
+
+        return builder.ok().data(rs).build()
     }
 
     @PostMapping("/register")
     fun register(@RequestBody request: RegisterRequest): ResponseEntity<Response> {
-        return builder.ok()
-            .data(authService.register(request))
-            .build()
+        val register = authService.register(request)
+
+        data class Response(
+            val id: Long,
+            val username: String,
+            val email: String,
+            val nickname: String,
+            val avatar: String?,
+        )
+
+        val rs = Response(
+            id = register.id,
+            username = register.username,
+            email = register.email,
+            nickname = register.nickname,
+            avatar = register.avatar,
+        )
+
+        return builder.ok().data(rs).build()
     }
 
     @PutMapping("/password")
@@ -39,10 +79,17 @@ class AuthController(
         @RequestBody request: ChangePasswordRequest,
     ): ResponseEntity<Response> {
         val principal = authentication.principal as AuthPrincipal
+        val changePassword = authService.changePassword(principal.userId, request)
 
-        return builder.ok()
-            .data(authService.changePassword(principal.userId, request))
-            .build()
+        data class Response(
+            val changed: Boolean,
+        )
+
+        val rs = Response(
+            changed = changePassword.changed,
+        )
+
+        return builder.ok().data(rs).build()
     }
 
     @GetMapping("/me")
@@ -50,14 +97,18 @@ class AuthController(
         val principal = authentication.principal as AuthPrincipal
         val authorities = principal.authorities.mapNotNull { it.authority }
 
-        return builder.ok()
-            .data(
-                LoginUserResponse(
-                    id = principal.userId,
-                    username = principal.username,
-                    authorities = authorities,
-                )
-            )
-            .build()
+        data class Response(
+            val id: Long,
+            val username: String,
+            val authorities: List<String>,
+        )
+
+        val rs = Response(
+            id = principal.userId,
+            username = principal.username,
+            authorities = authorities,
+        )
+
+        return builder.ok().data(rs).build()
     }
 }
