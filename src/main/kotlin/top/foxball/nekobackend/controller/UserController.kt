@@ -10,7 +10,9 @@ import top.foxball.nekobackend.handlder.UserNotFoundException
 import top.foxball.nekobackend.security.AuthPrincipal
 import top.foxball.nekobackend.service.EmailVerificationPurpose
 import top.foxball.nekobackend.service.EmailVerificationService
+import top.foxball.nekobackend.service.TagResponse
 import top.foxball.nekobackend.service.UserService
+import top.foxball.nekobackend.service.toTagResponses
 import top.foxball.nekobackend.shared.Response
 import top.foxball.nekobackend.shared.ResponseBuilder
 
@@ -51,6 +53,7 @@ class UserController(
             val isPhone: Boolean,
             val isQQNumber: Boolean,
             val contactInformation: List<String>,
+            val tags: List<TagResponse>,
         )
 
         val rs = user?.let {
@@ -72,6 +75,7 @@ class UserController(
                 isPhone = it.isPhone,
                 isQQNumber = it.isQQNumber,
                 contactInformation = it.contactInformation ?: emptyList(),
+                tags = it.tags.toTagResponses(),
             )
         }
 
@@ -227,6 +231,7 @@ class UserController(
             val isPhone: Boolean,
             val isQQNumber: Boolean,
             val contactInformation: List<String>,
+            val tags: List<TagResponse>,
         )
 
         val rs = Response(
@@ -249,6 +254,7 @@ class UserController(
             isPhone = savedUser.isPhone,
             isQQNumber = savedUser.isQQNumber,
             contactInformation = savedUser.contactInformation ?: emptyList(),
+            tags = savedUser.tags.toTagResponses(),
         )
 
         return builder.ok().data(rs).build()

@@ -214,6 +214,7 @@ class AuthServiceImpl(
                 isPhone = user.isPhone,
                 isQQNumber = user.isQQNumber,
                 contactInformation = user.contactInformation ?: emptyList(),
+                tags = user.tags.toTagResponses(),
                 authorities = authorities,
             ),
         )
@@ -314,6 +315,7 @@ class AuthServiceImpl(
             isPhone = isPhone,
             isQQNumber = isQQNumber,
             contactInformation = contactInformation ?: emptyList(),
+            tags = tags.toTagResponses(),
         )
     }
 }

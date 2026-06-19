@@ -34,6 +34,7 @@ data class LoginUserResponse(
     val isPhone: Boolean,
     val isQQNumber: Boolean,
     val contactInformation: List<String>,
+    val tags: List<TagResponse>,
     val authorities: List<String>,
 )
 
@@ -87,6 +88,7 @@ data class CurrentUserResponse(
     val isPhone: Boolean,
     val isQQNumber: Boolean,
     val contactInformation: List<String>,
+    val tags: List<TagResponse>,
 )
 
 data class ChangePasswordRequest(

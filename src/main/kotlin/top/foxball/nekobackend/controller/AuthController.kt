@@ -49,6 +49,7 @@ class AuthController(
             val isPhone: Boolean,
             val isQQNumber: Boolean,
             val contactInformation: List<String>,
+            val tags: List<TagResponse>,
             val authorities: List<String>,
         )
 
@@ -83,6 +84,7 @@ class AuthController(
                 isPhone = login.user.isPhone,
                 isQQNumber = login.user.isQQNumber,
                 contactInformation = login.user.contactInformation,
+                tags = login.user.tags,
                 authorities = login.user.authorities,
             ),
         )
@@ -246,6 +248,7 @@ class AuthController(
             val isPhone: Boolean,
             val isQQNumber: Boolean,
             val contactInformation: List<String>,
+            val tags: List<TagResponse>,
             val authorities: List<String>,
         )
 
@@ -269,6 +272,7 @@ class AuthController(
             isPhone = user.isPhone,
             isQQNumber = user.isQQNumber,
             contactInformation = user.contactInformation,
+            tags = user.tags,
             authorities = authorities,
         )
 

@@ -114,6 +114,16 @@ class User(
     @Column(name = "contact_information", length = 128)
     var contactInformation: MutableList<String>? = null,
 
+    /** 用户标签列表。 */
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_tag",
+        joinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")],
+        inverseJoinColumns = [JoinColumn(name = "tag_id", referencedColumnName = "id")],
+        uniqueConstraints = [UniqueConstraint(columnNames = ["user_id", "tag_id"])],
+    )
+    var tags: MutableSet<Tag> = mutableSetOf(),
+
     /** 角色列表。 */
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
