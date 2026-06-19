@@ -45,6 +45,7 @@ class SecurityConfig(
             .authorizeHttpRequests { auth ->
                 auth
                     .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/email-code/register").permitAll()
+                    .requestMatchers("/file/**").permitAll()
                     .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                     .anyRequest().authenticated()
             }

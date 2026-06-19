@@ -22,7 +22,6 @@ class FastJsonWebMvcConfiguration : WebMvcConfigurer {
         config.setWriterFeatures(
             JSONWriter.Feature.WriteMapNullValue,
             JSONWriter.Feature.FieldBased,
-            JSONWriter.Feature.WriteMapNullValue,        // 输出 null 字段
             JSONWriter.Feature.WriteBigDecimalAsPlain,   // BigDecimal 不丢精度
             JSONWriter.Feature.PrettyFormat,             // 格式化输出
         )
@@ -35,8 +34,6 @@ class FastJsonWebMvcConfiguration : WebMvcConfigurer {
         converter.fastJsonConfig = config
         converter.supportedMediaTypes = listOf(
             MediaType.APPLICATION_JSON,
-            MediaType.APPLICATION_FORM_URLENCODED,
-            MediaType.TEXT_PLAIN,
             MediaType("application", "vnd.spring-boot.actuator.*+json"),
         )
         return converter

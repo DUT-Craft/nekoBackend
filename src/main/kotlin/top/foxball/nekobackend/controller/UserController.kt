@@ -4,17 +4,21 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import top.foxball.nekobackend.handlder.ParamErrorException
 import top.foxball.nekobackend.handlder.UserAlreadyExistsException
 import top.foxball.nekobackend.handlder.UserNotFoundException
 import top.foxball.nekobackend.security.AuthPrincipal
 import top.foxball.nekobackend.service.EmailVerificationPurpose
 import top.foxball.nekobackend.service.EmailVerificationService
+import top.foxball.nekobackend.service.FileStorageService
+import top.foxball.nekobackend.service.FileUploadResponse
 import top.foxball.nekobackend.service.TagResponse
 import top.foxball.nekobackend.service.UserService
 import top.foxball.nekobackend.service.toTagResponses
 import top.foxball.nekobackend.shared.Response
 import top.foxball.nekobackend.shared.ResponseBuilder
+import java.util.Locale
 
 /**
  * 用户资料相关接口，负责公开用户资料查询、当前用户邮箱和个人资料维护。
@@ -24,6 +28,7 @@ import top.foxball.nekobackend.shared.ResponseBuilder
 class UserController(
     private val userService: UserService,
     private val emailVerificationService: EmailVerificationService,
+    private val fileStorageService: FileStorageService,
     private val builder: ResponseBuilder
 ) {
     /**
@@ -266,10 +271,61 @@ class UserController(
     }
 
     /**
+     * 上传当前登录用户头像，并把头像地址更新为文件下载地址。
+     */
+    @PostMapping("user/avatar")
+    fun uploadCurrentUserAvatar(
+        authentication: Authentication,
+        @RequestParam("file") file: MultipartFile,
+    ): ResponseEntity<Response> {
+        val principal = authentication.principal as AuthPrincipal
+        val user = userService.findById(principal.userId) ?: throw UserNotFoundException()
+        validateAvatarFile(file)
+
+        val uploadedFile = fileStorageService.upload(principal.userId, file)
+        user.avatar = uploadedFile.downloadUrl
+        val savedUser = userService.save(user)
+
+        data class Response(
+            val avatar: String?,
+            val file: FileUploadResponse,
+        )
+
+        return builder.ok()
+            .data(
+                Response(
+                    avatar = savedUser.avatar,
+                    file = uploadedFile,
+                )
+            )
+            .build()
+    }
+
+    /**
      * 统一清理可为空的文本字段，空白内容会被转换为 null。
      */
     private fun normalizeNullableText(value: String): String? {
         return value.trim().ifBlank { null }
+    }
+
+    private fun validateAvatarFile(file: MultipartFile) {
+        val filename = file.originalFilename
+            ?.substringAfterLast('/')
+            ?.substringAfterLast('\\')
+            .orEmpty()
+        val extension = filename.substringAfterLast('.', "").lowercase(Locale.ROOT)
+        if (extension !in ALLOWED_AVATAR_EXTENSIONS) {
+            throw ParamErrorException("头像文件仅支持 jpg、jpeg、png、gif、webp")
+        }
+
+        val contentType = file.contentType?.trim()?.lowercase(Locale.ROOT)
+        if (!contentType.isNullOrBlank() && !contentType.startsWith("image/")) {
+            throw ParamErrorException("头像文件必须是图片类型")
+        }
+    }
+
+    private companion object {
+        private val ALLOWED_AVATAR_EXTENSIONS = setOf("jpg", "jpeg", "png", "gif", "webp")
     }
 }
 

@@ -22,6 +22,9 @@ neko:
     max-idle-connections: ${OKHTTP_MAX_IDLE_CONNECTIONS:20}
     keep-alive-duration: ${OKHTTP_KEEP_ALIVE_DURATION:5m}
     retry-on-connection-failure: ${OKHTTP_RETRY_ON_CONNECTION_FAILURE:true}
+  file:
+    storage-path: ${FILE_STORAGE_PATH:./storage}
+    base-url: ${FILE_BASE_URL:http://localhost:8080}
 
 management:
   endpoint:
@@ -92,6 +95,10 @@ spring:
     hikari:
       maximum-pool-size: 10
       connection-timeout: 2000
+  servlet:
+    multipart:
+      max-file-size: ${FILE_MAX_SIZE:20MB}
+      max-request-size: ${FILE_MAX_REQUEST_SIZE:20MB}
   config:
     import: optional:file:.env[.properties]
   jpa:
