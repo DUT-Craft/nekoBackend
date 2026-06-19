@@ -30,5 +30,12 @@ interface EmailVerificationService {
         code: String,
         purpose: EmailVerificationPurpose,
         userAgent: String,
+        consumeOnSuccess: Boolean = true,
+    )
+
+    fun deleteCode(
+        username: String,
+        email: String,
+        purpose: EmailVerificationPurpose,
     )
 }

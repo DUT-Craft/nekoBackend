@@ -42,6 +42,7 @@ data class RegisterRequest(
     val password: String = "",
     val email: String = "",
     val verificationCode: String = "",
+    val inviteCode: String = "",
 )
 
 data class RegisterResponse(

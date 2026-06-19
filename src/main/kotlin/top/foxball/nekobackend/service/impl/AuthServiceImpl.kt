@@ -3,6 +3,9 @@ package top.foxball.nekobackend.service.impl
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronization
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import top.foxball.nekobackend.datasource.jdbc.Status
 import top.foxball.nekobackend.handlder.ParamErrorException
 import top.foxball.nekobackend.handlder.UserAlreadyExistsException
@@ -25,6 +28,7 @@ class AuthServiceImpl(
     private val jwtSessionService: JwtSessionService,
     private val jwtProperties: JwtProperties,
     private val emailVerificationService: EmailVerificationService,
+    private val inviteCodeService: InviteCodeService,
 ) : AuthService {
 
     override fun sendRegisterEmailCode(
@@ -52,12 +56,19 @@ class AuthServiceImpl(
         )
     }
 
+    @Transactional
     override fun register(request: RegisterRequest, userAgent: String): RegisterResponse {
         val username = request.username.trim()
         val email = request.email.trim()
 
-        if (username.isBlank() || request.password.isBlank() || email.isBlank() || request.verificationCode.isBlank()) {
-            throw ParamErrorException("用户名、密码、邮箱和验证码不能为空")
+        if (
+            username.isBlank() ||
+            request.password.isBlank() ||
+            email.isBlank() ||
+            request.verificationCode.isBlank() ||
+            request.inviteCode.isBlank()
+        ) {
+            throw ParamErrorException("用户名、密码、邮箱、验证码和邀请码不能为空")
         }
 
         emailVerificationService.verifyCode(
@@ -66,13 +77,22 @@ class AuthServiceImpl(
             code = request.verificationCode,
             purpose = EmailVerificationPurpose.REGISTER,
             userAgent = userAgent,
+            consumeOnSuccess = false,
         )
+        val inviteCode = inviteCodeService.validateForRegister(request.inviteCode, email, userAgent)
 
         val user = userService.createUser(
             username = username,
             password = request.password,
             email = email,
         )
+        inviteCodeService.consumeForRegister(
+            inviteCode = inviteCode,
+            user = user,
+            email = email,
+            userAgent = userAgent,
+        )
+        deleteRegisterEmailCodeAfterCommit(username, email)
 
         return user.toRegisterResponse()
     }
@@ -188,6 +208,29 @@ class AuthServiceImpl(
             isPhone = isPhone,
             isQQNumber = isQQNumber,
             contactInformation = contactInformation ?: emptyList(),
+        )
+    }
+
+    private fun deleteRegisterEmailCodeAfterCommit(username: String, email: String) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            emailVerificationService.deleteCode(
+                username = username,
+                email = email,
+                purpose = EmailVerificationPurpose.REGISTER,
+            )
+            return
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(
+            object : TransactionSynchronization {
+                override fun afterCommit() {
+                    emailVerificationService.deleteCode(
+                        username = username,
+                        email = email,
+                        purpose = EmailVerificationPurpose.REGISTER,
+                    )
+                }
+            }
         )
     }
 

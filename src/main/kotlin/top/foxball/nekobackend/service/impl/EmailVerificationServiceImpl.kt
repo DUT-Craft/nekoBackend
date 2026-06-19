@@ -76,6 +76,7 @@ class EmailVerificationServiceImpl(
         code: String,
         purpose: EmailVerificationPurpose,
         userAgent: String,
+        consumeOnSuccess: Boolean,
     ) {
         val normalizedUsername = normalizeUsername(username)
         val normalizedEmail = normalizeEmail(email)
@@ -97,7 +98,19 @@ class EmailVerificationServiceImpl(
             throw VerificationCodeInvalidException()
         }
 
-        emailCodeRepository.deleteById(key)
+        if (consumeOnSuccess) {
+            emailCodeRepository.deleteById(key)
+        }
+    }
+
+    override fun deleteCode(
+        username: String,
+        email: String,
+        purpose: EmailVerificationPurpose,
+    ) {
+        val normalizedUsername = normalizeUsername(username)
+        val normalizedEmail = normalizeEmail(email)
+        emailCodeRepository.deleteById(redisKey(purpose, normalizedUsername, normalizedEmail))
     }
 
     private fun buildMessage(
