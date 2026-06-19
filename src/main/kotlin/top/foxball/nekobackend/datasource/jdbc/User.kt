@@ -28,6 +28,10 @@ class User(
     @Column(name = "nickname", nullable = false, length = 64)
     var nickname: String = "Neko",
 
+    /** 用户身份，可以为空。 */
+    @Column(name = "identity", length = 64)
+    var identity: String? = null,
+
     /** 注册时间，不能为空。 */
     @Column(name = "register_time", nullable = false)
     var registerTime: LocalDateTime? = null,
@@ -132,15 +136,6 @@ class User(
         inverseJoinColumns = [JoinColumn(name = "role_id", referencedColumnName = "id")],
     )
     var roles: MutableSet<Role> = mutableSetOf(),
-
-    /** 直接授予用户的权限列表。 */
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "user_permission",
-        joinColumns = [JoinColumn(name = "user_id", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "permission_id", referencedColumnName = "id")],
-    )
-    var permissions: MutableSet<Permission> = mutableSetOf(),
 )
 
 /** 用户账号状态。 */

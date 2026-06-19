@@ -4,28 +4,10 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
 
-/** 自定义权限注解的核心判断逻辑。 */
+/** 用户组方法级授权的核心判断逻辑。 */
 @Component
-class PermissionAuthorizationService {
-
-    /** 判断当前认证用户是否满足指定权限要求。 */
-    fun hasPermissions(
-        authentication: Authentication?,
-        permissions: Array<out String>,
-        mode: AuthMatchMode,
-    ): Boolean {
-        if (!isAuthenticated(authentication)) return false
-
-        val requiredPermissions = permissions
-            .mapNotNull { it.trim().takeIf { permission -> permission.isNotBlank() } }
-            .toSet()
-        if (requiredPermissions.isEmpty()) return false
-
-        val authorities = authentication.authorityNames()
-        return matches(requiredPermissions, authorities, mode)
-    }
-
-    /** 判断当前认证用户是否满足指定角色要求。 */
+class GroupAuthorizationService {
+    /** 判断当前认证用户是否属于指定用户组。 */
     fun hasRoles(
         authentication: Authentication?,
         roles: Array<out String>,

@@ -10,10 +10,10 @@ import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
 import java.util.function.Supplier
 
-/** 把 @RequirePermission 和 @RequireRole 接入 Spring Security 方法级授权。 */
+/** 把 @RequireRole 接入 Spring Security 方法级用户组授权。 */
 @Component
-class PermissionAuthorizationManager(
-    private val authorizationService: PermissionAuthorizationService,
+class GroupAuthorizationManager(
+    private val authorizationService: GroupAuthorizationService,
 ) : AuthorizationManager<MethodInvocation> {
 
     override fun authorize(
@@ -24,22 +24,18 @@ class PermissionAuthorizationManager(
             ?: invocation.method.declaringClass
         val method = AopUtils.getMostSpecificMethod(invocation.method, targetClass)
 
-        val permissionAnnotations = findAnnotations<RequirePermission>(targetClass, method, invocation)
         val roleAnnotations = findAnnotations<RequireRole>(targetClass, method, invocation)
 
-        if (permissionAnnotations.isEmpty() && roleAnnotations.isEmpty()) {
+        if (roleAnnotations.isEmpty()) {
             return AuthorizationDecision(true)
         }
 
         val currentAuthentication = authentication.get()
-        val permissionGranted = permissionAnnotations.all {
-            authorizationService.hasPermissions(currentAuthentication, it.value, it.mode)
-        }
         val roleGranted = roleAnnotations.all {
             authorizationService.hasRoles(currentAuthentication, it.value, it.mode)
         }
 
-        return AuthorizationDecision(permissionGranted && roleGranted)
+        return AuthorizationDecision(roleGranted)
     }
 
     private inline fun <reified A : Annotation> findAnnotations(

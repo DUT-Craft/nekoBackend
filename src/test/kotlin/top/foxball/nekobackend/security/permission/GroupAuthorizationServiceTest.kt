@@ -8,37 +8,37 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-class PermissionAuthorizationServiceTest {
-    private val service = PermissionAuthorizationService()
+class GroupAuthorizationServiceTest {
+    private val service = GroupAuthorizationService()
 
     @Test
-    fun `permission all mode requires every permission`() {
-        val authentication = authentication("user:read", "user:update")
+    fun `role all mode requires every group`() {
+        val authentication = authentication("ROLE_ADMIN", "ROLE_OPERATOR")
 
         assertTrue(
-            service.hasPermissions(
+            service.hasRoles(
                 authentication,
-                arrayOf("user:read", "user:update"),
+                arrayOf("ADMIN", "OPERATOR"),
                 AuthMatchMode.ALL,
             )
         )
         assertFalse(
-            service.hasPermissions(
+            service.hasRoles(
                 authentication,
-                arrayOf("user:read", "user:delete"),
+                arrayOf("ADMIN", "MODERATOR"),
                 AuthMatchMode.ALL,
             )
         )
     }
 
     @Test
-    fun `permission any mode requires one permission`() {
-        val authentication = authentication("profile:update")
+    fun `role any mode requires one group`() {
+        val authentication = authentication("ROLE_OPERATOR")
 
         assertTrue(
-            service.hasPermissions(
+            service.hasRoles(
                 authentication,
-                arrayOf("profile:read", "profile:update"),
+                arrayOf("ADMIN", "OPERATOR"),
                 AuthMatchMode.ANY,
             )
         )
@@ -62,7 +62,6 @@ class PermissionAuthorizationServiceTest {
         )
 
         assertFalse(service.hasRoles(anonymous, arrayOf("ADMIN"), AuthMatchMode.ALL))
-        assertFalse(service.hasPermissions(anonymous, arrayOf("user:read"), AuthMatchMode.ALL))
     }
 
     private fun authentication(vararg authorities: String): Authentication {

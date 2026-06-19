@@ -9,18 +9,16 @@ import org.springframework.context.annotation.Role
 import org.springframework.security.authorization.method.AuthorizationInterceptorsOrder
 import org.springframework.security.authorization.method.AuthorizationManagerBeforeMethodInterceptor
 
-/** 注册自定义权限注解的方法级授权拦截器。 */
+/** 注册用户组方法级授权拦截器。 */
 @Configuration
-class PermissionMethodSecurityConfig {
+class GroupMethodSecurityConfig {
 
     @Bean
     @Role(BeanDefinition.ROLE_INFRASTRUCTURE)
-    fun permissionAuthorizationMethodInterceptor(
-        authorizationManager: PermissionAuthorizationManager,
+    fun groupAuthorizationMethodInterceptor(
+        authorizationManager: GroupAuthorizationManager,
     ): AuthorizationManagerBeforeMethodInterceptor {
-        val pointcut = ComposablePointcut(AnnotationMatchingPointcut.forClassAnnotation(RequirePermission::class.java))
-            .union(AnnotationMatchingPointcut.forMethodAnnotation(RequirePermission::class.java))
-            .union(AnnotationMatchingPointcut.forClassAnnotation(RequireRole::class.java))
+        val pointcut = ComposablePointcut(AnnotationMatchingPointcut.forClassAnnotation(RequireRole::class.java))
             .union(AnnotationMatchingPointcut.forMethodAnnotation(RequireRole::class.java))
 
         val interceptor = AuthorizationManagerBeforeMethodInterceptor(pointcut, authorizationManager)

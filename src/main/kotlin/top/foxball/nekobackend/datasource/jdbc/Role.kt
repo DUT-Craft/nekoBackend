@@ -18,13 +18,4 @@ data class Role(
 
     @Column(name = "description", length = 255)
     var description: String? = null,
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "role_permission",
-        joinColumns = [JoinColumn(name = "role_id", referencedColumnName = "id")],
-        inverseJoinColumns = [JoinColumn(name = "permission_id", referencedColumnName = "id")],
-    )
-    var permissions: MutableSet<Permission> = mutableSetOf(),
 )
-

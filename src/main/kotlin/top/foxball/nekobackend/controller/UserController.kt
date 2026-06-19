@@ -38,6 +38,7 @@ class UserController(
         data class Response(
             val username: String,
             val nickname: String,
+            val identity: String?,
             val avatar: String?,
             val signature: String?,
             val studentId: String?,
@@ -60,6 +61,7 @@ class UserController(
             Response(
                 username = it.username,
                 nickname = it.nickname,
+                identity = it.identity,
                 avatar = it.avatar,
                 signature = it.signature,
                 studentId = it.studentId.takeIf { _ -> it.isStudentId },
@@ -189,6 +191,7 @@ class UserController(
             }
             user.nickname = it
         }
+        request.identity?.let { user.identity = normalizeNullableText(it) }
         request.avatar?.let { user.avatar = normalizeNullableText(it) }
         request.signature?.let { user.signature = it.trim() }
         request.studentId?.let { user.studentId = normalizeNullableText(it) }
@@ -216,6 +219,7 @@ class UserController(
             val username: String,
             val email: String,
             val nickname: String,
+            val identity: String?,
             val avatar: String?,
             val signature: String?,
             val studentId: String?,
@@ -239,6 +243,7 @@ class UserController(
             username = savedUser.username,
             email = savedUser.email,
             nickname = savedUser.nickname,
+            identity = savedUser.identity,
             avatar = savedUser.avatar,
             signature = savedUser.signature,
             studentId = savedUser.studentId,
@@ -273,6 +278,7 @@ class UserController(
  */
 data class UpdateUserInfoRequest(
     val nickname: String? = null,
+    val identity: String? = null,
     val avatar: String? = null,
     val signature: String? = null,
     val studentId: String? = null,
