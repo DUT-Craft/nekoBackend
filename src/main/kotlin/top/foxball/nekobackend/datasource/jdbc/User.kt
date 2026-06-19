@@ -77,6 +77,34 @@ class User(
     @Column(name = "phone", length = 32)
     var phone: String? = null,
 
+    /** QQ 号，可以为空。 */
+    @Column(name = "qq_number", length = 32)
+    var qqNumber: String? = null,
+
+    /** 是否公开学号。 */
+    @Column(name = "is_student_id")
+    var isStudentId: Boolean = false,
+
+    /** 用户分组，可以为空。 */
+    @Column(name = "is_grouping", length = 64)
+    var isGrouping: String? = null,
+
+    /** 是否公开班级名称。 */
+    @Column(name = "is_class_name")
+    var isClassName: Boolean = false,
+
+    /** 是否公开专业名称。 */
+    @Column(name = "is_major")
+    var isMajor: Boolean = false,
+
+    /** 是否公开手机号。 */
+    @Column(name = "is_phone")
+    var isPhone: Boolean = false,
+
+    /** 是否公开 QQ 号。 */
+    @Column(name = "is_qq_number")
+    var isQQNumber: Boolean = false,
+
     /** 其他联系方式列表，可以为空。 */
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(

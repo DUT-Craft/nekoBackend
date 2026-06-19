@@ -17,6 +17,23 @@ data class LoginResponse(
 data class LoginUserResponse(
     val id: Long,
     val username: String,
+    val email: String,
+    val nickname: String,
+    val avatar: String?,
+    val signature: String?,
+    val studentId: String?,
+    val grade: String?,
+    val className: String?,
+    val major: String?,
+    val phone: String?,
+    val qqNumber: String?,
+    val isStudentId: Boolean,
+    val isGrouping: String?,
+    val isClassName: Boolean,
+    val isMajor: Boolean,
+    val isPhone: Boolean,
+    val isQQNumber: Boolean,
+    val contactInformation: List<String>,
     val authorities: List<String>,
 )
 
@@ -32,6 +49,42 @@ data class RegisterResponse(
     val email: String,
     val nickname: String,
     val avatar: String?,
+    val signature: String?,
+    val studentId: String?,
+    val grade: String?,
+    val className: String?,
+    val major: String?,
+    val phone: String?,
+    val qqNumber: String?,
+    val isStudentId: Boolean,
+    val isGrouping: String?,
+    val isClassName: Boolean,
+    val isMajor: Boolean,
+    val isPhone: Boolean,
+    val isQQNumber: Boolean,
+    val contactInformation: List<String>,
+)
+
+data class CurrentUserResponse(
+    val id: Long,
+    val username: String,
+    val email: String,
+    val nickname: String,
+    val avatar: String?,
+    val signature: String?,
+    val studentId: String?,
+    val grade: String?,
+    val className: String?,
+    val major: String?,
+    val phone: String?,
+    val qqNumber: String?,
+    val isStudentId: Boolean,
+    val isGrouping: String?,
+    val isClassName: Boolean,
+    val isMajor: Boolean,
+    val isPhone: Boolean,
+    val isQQNumber: Boolean,
+    val contactInformation: List<String>,
 )
 
 data class ChangePasswordRequest(
@@ -48,4 +101,5 @@ interface AuthService {
     fun register(request: RegisterRequest): RegisterResponse
     fun changePassword(userId: Long, request: ChangePasswordRequest): ChangePasswordResponse
     fun login(request: LoginRequest, userAgent: String): LoginResponse
+    fun currentUser(userId: Long): CurrentUserResponse
 }

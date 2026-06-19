@@ -25,16 +25,42 @@ class UserController(
         data class Response(
             val username: String,
             val nickname: String,
-            val avatar: String,
-            val signature: String
+            val avatar: String?,
+            val signature: String?,
+            val studentId: String?,
+            val grade: String?,
+            val className: String?,
+            val major: String?,
+            val phone: String?,
+            val qqNumber: String?,
+            val isStudentId: Boolean,
+            val isGrouping: String?,
+            val isClassName: Boolean,
+            val isMajor: Boolean,
+            val isPhone: Boolean,
+            val isQQNumber: Boolean,
+            val contactInformation: List<String>,
         )
 
         val rs = user?.let {
             Response(
                 username = it.username,
-                nickname = user.nickname,
-                avatar = user.avatar!!,
-                signature = user.signature!!
+                nickname = it.nickname,
+                avatar = it.avatar,
+                signature = it.signature,
+                studentId = it.studentId.takeIf { _ -> it.isStudentId },
+                grade = it.grade,
+                className = it.className.takeIf { _ -> it.isClassName },
+                major = it.major.takeIf { _ -> it.isMajor },
+                phone = it.phone.takeIf { _ -> it.isPhone },
+                qqNumber = it.qqNumber.takeIf { _ -> it.isQQNumber },
+                isStudentId = it.isStudentId,
+                isGrouping = it.isGrouping,
+                isClassName = it.isClassName,
+                isMajor = it.isMajor,
+                isPhone = it.isPhone,
+                isQQNumber = it.isQQNumber,
+                contactInformation = it.contactInformation ?: emptyList(),
             )
         }
 
@@ -62,6 +88,13 @@ class UserController(
         request.className?.let { user.className = normalizeNullableText(it) }
         request.major?.let { user.major = normalizeNullableText(it) }
         request.phone?.let { user.phone = normalizeNullableText(it) }
+        request.qqNumber?.let { user.qqNumber = normalizeNullableText(it) }
+        request.isStudentId?.let { user.isStudentId = it }
+        request.isGrouping?.let { user.isGrouping = normalizeNullableText(it) }
+        request.isClassName?.let { user.isClassName = it }
+        request.isMajor?.let { user.isMajor = it }
+        request.isPhone?.let { user.isPhone = it }
+        request.isQQNumber?.let { user.isQQNumber = it }
         request.contactInformation?.let { contacts ->
             user.contactInformation = contacts
                 .mapNotNull { normalizeNullableText(it) }
@@ -82,6 +115,13 @@ class UserController(
             val className: String?,
             val major: String?,
             val phone: String?,
+            val qqNumber: String?,
+            val isStudentId: Boolean,
+            val isGrouping: String?,
+            val isClassName: Boolean,
+            val isMajor: Boolean,
+            val isPhone: Boolean,
+            val isQQNumber: Boolean,
             val contactInformation: List<String>,
         )
 
@@ -97,6 +137,13 @@ class UserController(
             className = savedUser.className,
             major = savedUser.major,
             phone = savedUser.phone,
+            qqNumber = savedUser.qqNumber,
+            isStudentId = savedUser.isStudentId,
+            isGrouping = savedUser.isGrouping,
+            isClassName = savedUser.isClassName,
+            isMajor = savedUser.isMajor,
+            isPhone = savedUser.isPhone,
+            isQQNumber = savedUser.isQQNumber,
             contactInformation = savedUser.contactInformation ?: emptyList(),
         )
 
@@ -117,5 +164,12 @@ data class UpdateUserInfoRequest(
     val className: String? = null,
     val major: String? = null,
     val phone: String? = null,
+    val qqNumber: String? = null,
+    val isStudentId: Boolean? = null,
+    val isGrouping: String? = null,
+    val isClassName: Boolean? = null,
+    val isMajor: Boolean? = null,
+    val isPhone: Boolean? = null,
+    val isQQNumber: Boolean? = null,
     val contactInformation: List<String>? = null,
 )

@@ -39,13 +39,7 @@ class AuthServiceImpl(
             email = email,
         )
 
-        return RegisterResponse(
-            id = user.id ?: throw IllegalStateException("Created user id is missing."),
-            username = user.username,
-            email = user.email,
-            nickname = user.nickname,
-            avatar = user.avatar,
-        )
+        return user.toRegisterResponse()
     }
 
     override fun changePassword(userId: Long, request: ChangePasswordRequest): ChangePasswordResponse {
@@ -93,6 +87,7 @@ class AuthServiceImpl(
         }
 
         val authorities = principal.authorities.mapNotNull { it.authority }
+        val user = userService.findById(principal.userId) ?: throw UserNotFoundException()
         val accessToken = jwtTokenService.createAccessToken(
             userId = principal.userId,
             username = principal.username,
@@ -109,10 +104,79 @@ class AuthServiceImpl(
             accessToken = accessToken,
             expiresIn = jwtProperties.accessTokenTtlSeconds,
             user = LoginUserResponse(
-                id = principal.userId,
-                username = principal.username,
+                id = user.id ?: principal.userId,
+                username = user.username,
+                email = user.email,
+                nickname = user.nickname,
+                avatar = user.avatar,
+                signature = user.signature,
+                studentId = user.studentId,
+                grade = user.grade,
+                className = user.className,
+                major = user.major,
+                phone = user.phone,
+                qqNumber = user.qqNumber,
+                isStudentId = user.isStudentId,
+                isGrouping = user.isGrouping,
+                isClassName = user.isClassName,
+                isMajor = user.isMajor,
+                isPhone = user.isPhone,
+                isQQNumber = user.isQQNumber,
+                contactInformation = user.contactInformation ?: emptyList(),
                 authorities = authorities,
             ),
+        )
+    }
+
+    override fun currentUser(userId: Long): CurrentUserResponse {
+        return userService.findById(userId)?.toCurrentUserResponse() ?: throw UserNotFoundException()
+    }
+
+    private fun top.foxball.nekobackend.datasource.jdbc.User.toRegisterResponse(): RegisterResponse {
+        return RegisterResponse(
+            id = id ?: throw IllegalStateException("Created user id is missing."),
+            username = username,
+            email = email,
+            nickname = nickname,
+            avatar = avatar,
+            signature = signature,
+            studentId = studentId,
+            grade = grade,
+            className = className,
+            major = major,
+            phone = phone,
+            qqNumber = qqNumber,
+            isStudentId = isStudentId,
+            isGrouping = isGrouping,
+            isClassName = isClassName,
+            isMajor = isMajor,
+            isPhone = isPhone,
+            isQQNumber = isQQNumber,
+            contactInformation = contactInformation ?: emptyList(),
+        )
+    }
+
+    private fun top.foxball.nekobackend.datasource.jdbc.User.toCurrentUserResponse(): CurrentUserResponse {
+        return CurrentUserResponse(
+            id = id ?: throw IllegalStateException("User id is missing."),
+            username = username,
+            email = email,
+            nickname = nickname,
+            avatar = avatar,
+            signature = signature,
+            studentId = studentId,
+            grade = grade,
+            className = className,
+            major = major,
+            phone = phone,
+            qqNumber = qqNumber,
+            isStudentId = isStudentId,
+            isGrouping = isGrouping,
+            isClassName = isClassName,
+            isMajor = isMajor,
+            isPhone = isPhone,
+            isQQNumber = isQQNumber,
+            contactInformation = contactInformation ?: emptyList(),
         )
     }
 }
