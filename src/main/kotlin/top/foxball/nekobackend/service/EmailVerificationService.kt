@@ -8,6 +8,7 @@ enum class EmailVerificationPurpose(
 ) {
     REGISTER("register", "注册验证码"),
     CHANGE_EMAIL("change_email", "修改邮箱验证码"),
+    CHANGE_PASSWORD("change_password", "修改密码验证码"),
 }
 
 data class SendEmailVerificationCodeResponse(

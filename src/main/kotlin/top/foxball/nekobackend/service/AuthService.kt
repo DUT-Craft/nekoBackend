@@ -92,6 +92,7 @@ data class CurrentUserResponse(
 data class ChangePasswordRequest(
     val oldPassword: String = "",
     val newPassword: String = "",
+    val verificationCode: String = "",
 )
 
 data class ChangePasswordResponse(
@@ -111,7 +112,8 @@ interface AuthService {
     ): SendEmailVerificationCodeResponse
 
     fun register(request: RegisterRequest, userAgent: String): RegisterResponse
-    fun changePassword(userId: Long, request: ChangePasswordRequest): ChangePasswordResponse
+    fun sendChangePasswordEmailCode(userId: Long, userAgent: String): SendEmailVerificationCodeResponse
+    fun changePassword(userId: Long, request: ChangePasswordRequest, userAgent: String): ChangePasswordResponse
     fun login(request: LoginRequest, userAgent: String): LoginResponse
     fun currentUser(userId: Long): CurrentUserResponse
 }

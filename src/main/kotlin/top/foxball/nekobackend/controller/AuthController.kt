@@ -9,6 +9,9 @@ import top.foxball.nekobackend.service.*
 import top.foxball.nekobackend.shared.Response
 import top.foxball.nekobackend.shared.ResponseBuilder
 
+/**
+ * 认证相关接口，负责登录、注册、密码变更和当前登录用户信息查询。
+ */
 @RestController
 @RequestMapping("/api/auth")
 class AuthController(
@@ -16,6 +19,9 @@ class AuthController(
     private val builder: ResponseBuilder,
 ) {
 
+    /**
+     * 使用账号密码登录，并返回访问令牌与当前用户基础资料。
+     */
     @PostMapping("/login")
     fun login(
         @RequestBody request: LoginRequest,
@@ -84,6 +90,9 @@ class AuthController(
         return builder.ok().data(rs).build()
     }
 
+    /**
+     * 发送注册邮箱验证码，用于后续注册校验。
+     */
     @PostMapping("/email-code/register")
     fun sendRegisterEmailCode(
         @RequestBody request: SendRegisterEmailCodeRequest,
@@ -104,6 +113,9 @@ class AuthController(
         return builder.ok().data(rs).build()
     }
 
+    /**
+     * 根据注册信息创建用户账号。
+     */
     @PostMapping("/register")
     fun register(
         @RequestBody request: RegisterRequest,
@@ -158,13 +170,41 @@ class AuthController(
         return builder.ok().data(rs).build()
     }
 
+    /**
+     * 向当前登录用户邮箱发送修改密码验证码。
+     */
+    @PostMapping("/email-code/password")
+    fun sendChangePasswordEmailCode(
+        authentication: Authentication,
+        @RequestHeader(HttpHeaders.USER_AGENT, required = true) userAgent: String,
+    ): ResponseEntity<Response> {
+        val principal = authentication.principal as AuthPrincipal
+        val result = authService.sendChangePasswordEmailCode(principal.userId, userAgent)
+
+        data class Response(
+            val sent: Boolean,
+            val expiresInSeconds: Long,
+        )
+
+        val rs = Response(
+            sent = result.sent,
+            expiresInSeconds = result.expiresInSeconds,
+        )
+
+        return builder.ok().data(rs).build()
+    }
+
+    /**
+     * 校验邮箱验证码后修改当前登录用户的密码。
+     */
     @PutMapping("/password")
     fun changePassword(
         authentication: Authentication,
         @RequestBody request: ChangePasswordRequest,
+        @RequestHeader(HttpHeaders.USER_AGENT, required = true) userAgent: String,
     ): ResponseEntity<Response> {
         val principal = authentication.principal as AuthPrincipal
-        val changePassword = authService.changePassword(principal.userId, request)
+        val changePassword = authService.changePassword(principal.userId, request, userAgent)
 
         data class Response(
             val changed: Boolean,
@@ -177,6 +217,9 @@ class AuthController(
         return builder.ok().data(rs).build()
     }
 
+    /**
+     * 获取当前登录用户资料和授权信息。
+     */
     @GetMapping("/me")
     fun me(authentication: Authentication): ResponseEntity<Response> {
         val principal = authentication.principal as AuthPrincipal

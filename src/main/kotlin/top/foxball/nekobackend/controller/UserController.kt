@@ -14,6 +14,9 @@ import top.foxball.nekobackend.service.UserService
 import top.foxball.nekobackend.shared.Response
 import top.foxball.nekobackend.shared.ResponseBuilder
 
+/**
+ * 用户资料相关接口，负责公开用户资料查询、当前用户邮箱和个人资料维护。
+ */
 @RestController
 @RequestMapping("/api/")
 class UserController(
@@ -21,6 +24,9 @@ class UserController(
     private val emailVerificationService: EmailVerificationService,
     private val builder: ResponseBuilder
 ) {
+    /**
+     * 根据用户名查询用户公开资料。
+     */
     @GetMapping("userByUsername")
     fun getUserByUsername(
         @RequestParam username: String
@@ -72,6 +78,9 @@ class UserController(
         return builder.ok().data(rs).build()
     }
 
+    /**
+     * 向当前登录用户的新邮箱发送换绑验证码。
+     */
     @PostMapping("user/email-code")
     fun sendChangeEmailCode(
         authentication: Authentication,
@@ -112,6 +121,9 @@ class UserController(
         return builder.ok().data(rs).build()
     }
 
+    /**
+     * 校验邮箱验证码并修改当前登录用户邮箱。
+     */
     @PutMapping("user/email")
     fun changeCurrentUserEmail(
         authentication: Authentication,
@@ -156,6 +168,9 @@ class UserController(
         return builder.ok().data(rs).build()
     }
 
+    /**
+     * 更新当前登录用户的个人资料和资料可见性配置。
+     */
     @PutMapping("user/profile")
     fun updateCurrentUserInfo(
         authentication: Authentication,
@@ -239,11 +254,17 @@ class UserController(
         return builder.ok().data(rs).build()
     }
 
+    /**
+     * 统一清理可为空的文本字段，空白内容会被转换为 null。
+     */
     private fun normalizeNullableText(value: String): String? {
         return value.trim().ifBlank { null }
     }
 }
 
+/**
+ * 当前登录用户个人资料更新请求。
+ */
 data class UpdateUserInfoRequest(
     val nickname: String? = null,
     val avatar: String? = null,
@@ -263,10 +284,16 @@ data class UpdateUserInfoRequest(
     val contactInformation: List<String>? = null,
 )
 
+/**
+ * 当前登录用户邮箱换绑验证码发送请求。
+ */
 data class SendChangeEmailCodeRequest(
     val email: String = "",
 )
 
+/**
+ * 当前登录用户邮箱换绑确认请求。
+ */
 data class ChangeEmailRequest(
     val email: String = "",
     val verificationCode: String = "",

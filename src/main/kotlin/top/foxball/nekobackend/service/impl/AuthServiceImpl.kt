@@ -97,9 +97,35 @@ class AuthServiceImpl(
         return user.toRegisterResponse()
     }
 
-    override fun changePassword(userId: Long, request: ChangePasswordRequest): ChangePasswordResponse {
-        if (request.oldPassword.isBlank() || request.newPassword.isBlank()) {
-            throw ParamErrorException("旧密码和新密码不能为空")
+    override fun sendChangePasswordEmailCode(
+        userId: Long,
+        userAgent: String,
+    ): SendEmailVerificationCodeResponse {
+        val user = userService.findById(userId) ?: throw UserNotFoundException()
+        if (user.status != Status.ACTIVE) {
+            throw UserDisabledException()
+        }
+
+        return emailVerificationService.sendCode(
+            username = user.username,
+            email = user.email,
+            purpose = EmailVerificationPurpose.CHANGE_PASSWORD,
+            userAgent = userAgent,
+        )
+    }
+
+    @Transactional
+    override fun changePassword(
+        userId: Long,
+        request: ChangePasswordRequest,
+        userAgent: String,
+    ): ChangePasswordResponse {
+        if (
+            request.oldPassword.isBlank() ||
+            request.newPassword.isBlank() ||
+            request.verificationCode.isBlank()
+        ) {
+            throw ParamErrorException("旧密码、新密码和验证码不能为空")
         }
 
         val user = userService.findById(userId) ?: throw UserNotFoundException()
@@ -111,10 +137,20 @@ class AuthServiceImpl(
             throw UsernameOrPasswordErrorException("旧密码错误")
         }
 
+        emailVerificationService.verifyCode(
+            username = user.username,
+            email = user.email,
+            code = request.verificationCode,
+            purpose = EmailVerificationPurpose.CHANGE_PASSWORD,
+            userAgent = userAgent,
+            consumeOnSuccess = false,
+        )
+
         user.password = passwordEncoder.encode(request.newPassword)
             ?: throw IllegalStateException("Password encoding failed.")
         userService.save(user)
         jwtSessionService.revokeAll(userId)
+        deleteChangePasswordEmailCodeAfterCommit(user.username, user.email)
 
         return ChangePasswordResponse(changed = true)
     }
@@ -228,6 +264,29 @@ class AuthServiceImpl(
                         username = username,
                         email = email,
                         purpose = EmailVerificationPurpose.REGISTER,
+                    )
+                }
+            }
+        )
+    }
+
+    private fun deleteChangePasswordEmailCodeAfterCommit(username: String, email: String) {
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            emailVerificationService.deleteCode(
+                username = username,
+                email = email,
+                purpose = EmailVerificationPurpose.CHANGE_PASSWORD,
+            )
+            return
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(
+            object : TransactionSynchronization {
+                override fun afterCommit() {
+                    emailVerificationService.deleteCode(
+                        username = username,
+                        email = email,
+                        purpose = EmailVerificationPurpose.CHANGE_PASSWORD,
                     )
                 }
             }

@@ -14,6 +14,9 @@ import top.foxball.nekobackend.shared.Response
 import top.foxball.nekobackend.shared.ResponseBuilder
 import java.time.LocalDateTime
 
+/**
+ * Minecraft Java 服务器接口，负责当前用户的服务器信息创建、查询、更新和删除。
+ */
 @RestController
 @RequestMapping("/api/minecraft/java/servers")
 class MinecraftJavaServerController(
@@ -21,6 +24,9 @@ class MinecraftJavaServerController(
     private val builder: ResponseBuilder,
 ) {
 
+    /**
+     * 为当前登录用户创建 Minecraft Java 服务器记录。
+     */
     @PostMapping
     fun create(
         authentication: Authentication,
@@ -76,6 +82,9 @@ class MinecraftJavaServerController(
         return builder.ok().data(rs).build()
     }
 
+    /**
+     * 查询当前登录用户的 Minecraft Java 服务器列表，可按版本、类型和状态过滤。
+     */
     @GetMapping
     fun listMine(
         authentication: Authentication,
@@ -140,6 +149,9 @@ class MinecraftJavaServerController(
         return builder.ok().data(rs).build()
     }
 
+    /**
+     * 查询当前登录用户名下指定 Minecraft Java 服务器详情。
+     */
     @GetMapping("/{id}")
     fun getById(
         authentication: Authentication,
@@ -195,6 +207,9 @@ class MinecraftJavaServerController(
         return builder.ok().data(rs).build()
     }
 
+    /**
+     * 更新当前登录用户名下指定 Minecraft Java 服务器的基础信息。
+     */
     @PutMapping("/{id}")
     fun update(
         authentication: Authentication,
@@ -251,6 +266,9 @@ class MinecraftJavaServerController(
         return builder.ok().data(rs).build()
     }
 
+    /**
+     * 更新当前登录用户名下指定 Minecraft Java 服务器的运行状态。
+     */
     @PatchMapping("/{id}/status")
     fun updateStatus(
         authentication: Authentication,
@@ -307,6 +325,9 @@ class MinecraftJavaServerController(
         return builder.ok().data(rs).build()
     }
 
+    /**
+     * 删除当前登录用户名下指定 Minecraft Java 服务器记录。
+     */
     @DeleteMapping("/{id}")
     fun delete(
         authentication: Authentication,
