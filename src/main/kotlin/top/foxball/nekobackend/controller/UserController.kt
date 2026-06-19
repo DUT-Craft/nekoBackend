@@ -1,11 +1,15 @@
 package top.foxball.nekobackend.controller
 
+import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import top.foxball.nekobackend.handlder.ParamErrorException
+import top.foxball.nekobackend.handlder.UserAlreadyExistsException
 import top.foxball.nekobackend.handlder.UserNotFoundException
 import top.foxball.nekobackend.security.AuthPrincipal
+import top.foxball.nekobackend.service.EmailVerificationPurpose
+import top.foxball.nekobackend.service.EmailVerificationService
 import top.foxball.nekobackend.service.UserService
 import top.foxball.nekobackend.shared.Response
 import top.foxball.nekobackend.shared.ResponseBuilder
@@ -14,6 +18,7 @@ import top.foxball.nekobackend.shared.ResponseBuilder
 @RequestMapping("/api/")
 class UserController(
     private val userService: UserService,
+    private val emailVerificationService: EmailVerificationService,
     private val builder: ResponseBuilder
 ) {
     @GetMapping("userByUsername")
@@ -63,6 +68,90 @@ class UserController(
                 contactInformation = it.contactInformation ?: emptyList(),
             )
         }
+
+        return builder.ok().data(rs).build()
+    }
+
+    @PostMapping("user/email-code")
+    fun sendChangeEmailCode(
+        authentication: Authentication,
+        @RequestBody request: SendChangeEmailCodeRequest,
+        @RequestHeader(HttpHeaders.USER_AGENT, required = true) userAgent: String,
+    ): ResponseEntity<Response> {
+        val principal = authentication.principal as AuthPrincipal
+        val user = userService.findById(principal.userId) ?: throw UserNotFoundException()
+        val email = request.email.trim()
+        if (email.isBlank()) {
+            throw ParamErrorException("邮箱不能为空")
+        }
+        if (email == user.email) {
+            throw ParamErrorException("新邮箱不能与当前邮箱相同")
+        }
+        val usedUser = userService.findByEmail(email)
+        if (usedUser != null && usedUser.id != user.id) {
+            throw UserAlreadyExistsException("邮箱已存在")
+        }
+
+        val result = emailVerificationService.sendCode(
+            username = user.username,
+            email = email,
+            purpose = EmailVerificationPurpose.CHANGE_EMAIL,
+            userAgent = userAgent,
+        )
+
+        data class Response(
+            val sent: Boolean,
+            val expiresInSeconds: Long,
+        )
+
+        val rs = Response(
+            sent = result.sent,
+            expiresInSeconds = result.expiresInSeconds,
+        )
+
+        return builder.ok().data(rs).build()
+    }
+
+    @PutMapping("user/email")
+    fun changeCurrentUserEmail(
+        authentication: Authentication,
+        @RequestBody request: ChangeEmailRequest,
+        @RequestHeader(HttpHeaders.USER_AGENT, required = true) userAgent: String,
+    ): ResponseEntity<Response> {
+        val principal = authentication.principal as AuthPrincipal
+        val user = userService.findById(principal.userId) ?: throw UserNotFoundException()
+        val email = request.email.trim()
+        if (email.isBlank() || request.verificationCode.isBlank()) {
+            throw ParamErrorException("邮箱和验证码不能为空")
+        }
+        if (email == user.email) {
+            throw ParamErrorException("新邮箱不能与当前邮箱相同")
+        }
+        val usedUser = userService.findByEmail(email)
+        if (usedUser != null && usedUser.id != user.id) {
+            throw UserAlreadyExistsException("邮箱已存在")
+        }
+
+        emailVerificationService.verifyCode(
+            username = user.username,
+            email = email,
+            code = request.verificationCode,
+            purpose = EmailVerificationPurpose.CHANGE_EMAIL,
+            userAgent = userAgent,
+        )
+
+        user.email = email
+        val savedUser = userService.save(user)
+
+        data class Response(
+            val changed: Boolean,
+            val email: String,
+        )
+
+        val rs = Response(
+            changed = true,
+            email = savedUser.email,
+        )
 
         return builder.ok().data(rs).build()
     }
@@ -172,4 +261,13 @@ data class UpdateUserInfoRequest(
     val isPhone: Boolean? = null,
     val isQQNumber: Boolean? = null,
     val contactInformation: List<String>? = null,
+)
+
+data class SendChangeEmailCodeRequest(
+    val email: String = "",
+)
+
+data class ChangeEmailRequest(
+    val email: String = "",
+    val verificationCode: String = "",
 )

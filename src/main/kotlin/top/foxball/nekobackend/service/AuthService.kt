@@ -41,6 +41,7 @@ data class RegisterRequest(
     val username: String = "",
     val password: String = "",
     val email: String = "",
+    val verificationCode: String = "",
 )
 
 data class RegisterResponse(
@@ -96,9 +97,19 @@ data class ChangePasswordResponse(
     val changed: Boolean,
 )
 
+data class SendRegisterEmailCodeRequest(
+    val username: String = "",
+    val email: String = "",
+)
+
 @Service
 interface AuthService {
-    fun register(request: RegisterRequest): RegisterResponse
+    fun sendRegisterEmailCode(
+        request: SendRegisterEmailCodeRequest,
+        userAgent: String,
+    ): SendEmailVerificationCodeResponse
+
+    fun register(request: RegisterRequest, userAgent: String): RegisterResponse
     fun changePassword(userId: Long, request: ChangePasswordRequest): ChangePasswordResponse
     fun login(request: LoginRequest, userAgent: String): LoginResponse
     fun currentUser(userId: Long): CurrentUserResponse

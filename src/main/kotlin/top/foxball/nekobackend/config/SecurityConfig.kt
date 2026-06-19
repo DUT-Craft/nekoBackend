@@ -27,7 +27,7 @@ class SecurityConfig(
     /**
      * 构建无状态安全过滤器链。
      *
-     * 登录和注册接口放行，其余接口默认要求认证。
+     * 登录、注册和注册验证码接口放行，其余接口默认要求认证。
      */
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -44,7 +44,7 @@ class SecurityConfig(
             }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                    .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/email-code/register").permitAll()
                     .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                     .anyRequest().authenticated()
             }

@@ -84,9 +84,32 @@ class AuthController(
         return builder.ok().data(rs).build()
     }
 
+    @PostMapping("/email-code/register")
+    fun sendRegisterEmailCode(
+        @RequestBody request: SendRegisterEmailCodeRequest,
+        @RequestHeader(HttpHeaders.USER_AGENT, required = true) userAgent: String,
+    ): ResponseEntity<Response> {
+        val result = authService.sendRegisterEmailCode(request, userAgent)
+
+        data class Response(
+            val sent: Boolean,
+            val expiresInSeconds: Long,
+        )
+
+        val rs = Response(
+            sent = result.sent,
+            expiresInSeconds = result.expiresInSeconds,
+        )
+
+        return builder.ok().data(rs).build()
+    }
+
     @PostMapping("/register")
-    fun register(@RequestBody request: RegisterRequest): ResponseEntity<Response> {
-        val register = authService.register(request)
+    fun register(
+        @RequestBody request: RegisterRequest,
+        @RequestHeader(HttpHeaders.USER_AGENT, required = true) userAgent: String,
+    ): ResponseEntity<Response> {
+        val register = authService.register(request, userAgent)
 
         data class Response(
             val id: Long,

@@ -5,6 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import top.foxball.nekobackend.datasource.jdbc.Status
 import top.foxball.nekobackend.handlder.ParamErrorException
+import top.foxball.nekobackend.handlder.UserAlreadyExistsException
 import top.foxball.nekobackend.handlder.UserDisabledException
 import top.foxball.nekobackend.handlder.UserNotFoundException
 import top.foxball.nekobackend.handlder.UsernameOrPasswordErrorException
@@ -23,15 +24,49 @@ class AuthServiceImpl(
     private val jwtTokenService: JwtTokenService,
     private val jwtSessionService: JwtSessionService,
     private val jwtProperties: JwtProperties,
+    private val emailVerificationService: EmailVerificationService,
 ) : AuthService {
 
-    override fun register(request: RegisterRequest): RegisterResponse {
+    override fun sendRegisterEmailCode(
+        request: SendRegisterEmailCodeRequest,
+        userAgent: String,
+    ): SendEmailVerificationCodeResponse {
         val username = request.username.trim()
         val email = request.email.trim()
 
-        if (username.isBlank() || request.password.isBlank() || email.isBlank()) {
-            throw ParamErrorException("用户名、密码和邮箱不能为空")
+        if (username.isBlank() || email.isBlank()) {
+            throw ParamErrorException("用户名和邮箱不能为空")
         }
+        if (userService.findByUsername(username) != null) {
+            throw UserAlreadyExistsException("用户名已存在")
+        }
+        if (userService.findByEmail(email) != null) {
+            throw UserAlreadyExistsException("邮箱已存在")
+        }
+
+        return emailVerificationService.sendCode(
+            username = username,
+            email = email,
+            purpose = EmailVerificationPurpose.REGISTER,
+            userAgent = userAgent,
+        )
+    }
+
+    override fun register(request: RegisterRequest, userAgent: String): RegisterResponse {
+        val username = request.username.trim()
+        val email = request.email.trim()
+
+        if (username.isBlank() || request.password.isBlank() || email.isBlank() || request.verificationCode.isBlank()) {
+            throw ParamErrorException("用户名、密码、邮箱和验证码不能为空")
+        }
+
+        emailVerificationService.verifyCode(
+            username = username,
+            email = email,
+            code = request.verificationCode,
+            purpose = EmailVerificationPurpose.REGISTER,
+            userAgent = userAgent,
+        )
 
         val user = userService.createUser(
             username = username,

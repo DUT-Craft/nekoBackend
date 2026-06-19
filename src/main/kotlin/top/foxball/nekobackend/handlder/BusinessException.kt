@@ -83,6 +83,20 @@ class ParamErrorException(
 ) : BusinessException(HttpStatus.BAD_REQUEST, message)
 
 /**
+ * 验证码错误或已过期
+ */
+class VerificationCodeInvalidException(
+    message: String = "验证码错误或已过期"
+) : BusinessException(HttpStatus.BAD_REQUEST, message)
+
+/**
+ * 邮件发送失败
+ */
+class EmailSendFailedException(
+    message: String = "验证码邮件发送失败，请稍后重试"
+) : BusinessException(HttpStatus.SERVICE_UNAVAILABLE, message)
+
+/**
  * Token 无效异常
  * 当提供的 Token 无法识别或无效时抛出
  */

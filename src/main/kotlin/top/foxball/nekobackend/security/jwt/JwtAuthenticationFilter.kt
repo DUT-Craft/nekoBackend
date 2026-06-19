@@ -92,16 +92,12 @@ class JwtAuthenticationFilter(
         }
     }
 
-    /** 登录接口和非放行接口必须携带 User-Agent；注册、健康检查和预检请求不强制。 */
+    /** 业务接口必须携带 User-Agent；健康检查和预检请求不强制。 */
     private fun requiresUserAgent(request: HttpServletRequest): Boolean {
         if (HttpMethod.OPTIONS.matches(request.method)) return false
 
         val path = request.servletPath
-        if (path == "/api/auth/login") return true
-
-        return path != "/api/auth/register" &&
-            path != "/actuator/info" &&
-            !path.startsWith("/actuator/health")
+        return path != "/actuator/info" && !path.startsWith("/actuator/health")
     }
 
     /** 统一输出 JSON 格式的认证错误。 */
