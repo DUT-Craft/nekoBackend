@@ -13,7 +13,7 @@ import top.foxball.nekobackend.service.TagResponse
 import top.foxball.nekobackend.service.TagService
 import top.foxball.nekobackend.service.toTagResponses
 import java.time.LocalDateTime
-import java.util.Locale
+import java.util.*
 
 @Service
 class TagServiceImpl(
@@ -89,7 +89,7 @@ class TagServiceImpl(
             throw ParamErrorException("标签名称不能为空")
         }
         if (tagName.length > MAX_TAG_NAME_LENGTH) {
-            throw ParamErrorException("标签名称不能超过 ${MAX_TAG_NAME_LENGTH} 个字符")
+            throw ParamErrorException("标签名称不能超过 $MAX_TAG_NAME_LENGTH 个字符")
         }
         return tagName
     }

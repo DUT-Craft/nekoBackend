@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8020
 
 security:
   jwt:
@@ -55,6 +55,10 @@ management:
       rabbitmq: true
       system: true
   endpoints:
+    jmx:
+      exposure:
+        include: "*"
+
     web:
       exposure:
         # 对外暴露的 Actuator 端点列表
@@ -71,6 +75,8 @@ management:
 spring:
   application:
     name: NekoBackend
+  jmx:
+    enabled: true
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:25}

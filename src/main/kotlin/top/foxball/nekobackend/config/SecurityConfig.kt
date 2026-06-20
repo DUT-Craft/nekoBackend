@@ -7,9 +7,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import top.foxball.nekobackend.security.jwt.JwtAuthenticationFilter
 import top.foxball.nekobackend.security.RestAccessDeniedHandler
 import top.foxball.nekobackend.security.RestAuthenticationEntryPoint
+import top.foxball.nekobackend.security.jwt.JwtAuthenticationFilter
 
 /**
  * Spring Security 安全配置。

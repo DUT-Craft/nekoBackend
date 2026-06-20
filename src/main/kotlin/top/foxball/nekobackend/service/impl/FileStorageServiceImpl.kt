@@ -17,8 +17,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.Locale
-import java.util.UUID
+import java.util.*
 
 @Service
 class FileStorageServiceImpl(
@@ -187,12 +186,12 @@ class FileStorageServiceImpl(
 
         val filename = cleaned.ifBlank { "file-${UUID.randomUUID()}" }
         if (filename.length > MAX_FILENAME_LENGTH) {
-            throw ParamErrorException("文件名不能超过 ${MAX_FILENAME_LENGTH} 个字符")
+            throw ParamErrorException("文件名不能超过 $MAX_FILENAME_LENGTH 个字符")
         }
 
         val extension = extensionOf(filename)
         if (extension != null && extension.length > MAX_EXTENSION_LENGTH) {
-            throw ParamErrorException("文件后缀不能超过 ${MAX_EXTENSION_LENGTH} 个字符")
+            throw ParamErrorException("文件后缀不能超过 $MAX_EXTENSION_LENGTH 个字符")
         }
 
         return filename
