@@ -43,3 +43,4 @@ out/
 /docs/
 /.codemoss/prompt.json
 /logs/app.log
+/logs/

@@ -30,6 +30,33 @@ class MockUserDataInitializer(
         if (users.isNotEmpty()) {
             userRepository.saveAll(users)
         }
+
+        val admin = User(
+            username = "admin",
+            password = passwordEncoder.encode(DEFAULT_PASSWORD)
+                ?: throw IllegalStateException("Password encoding failed."),
+            email = "admin@example.com",
+            nickname = "admin",
+            registerTime = LocalDateTime.now(),
+            status = Status.ACTIVE,
+            signature = "这是admin模拟用户。",
+            avatar = "https://cdn.jsdelivr.net/gh/sakuranoki/cdn/img/avatar/default.png",
+            studentId = "2026admin",
+            grade = "2026级",
+            className = "软件admin班",
+            major = "软件工程",
+            phone = "138000000admin",
+            qqNumber = "100000admin",
+            isStudentId = true,
+            isGrouping = "mock",
+            isClassName = true,
+            isMajor = true,
+            isPhone = false,
+            isQQNumber = false,
+            contactInformation = mutableListOf("mock_user_admin@example.com"),
+        )
+        userRepository.save( admin)
+        println("已生成模拟管理用户：$admin")
     }
 
     private fun buildMockUser(index: Int, now: LocalDateTime): User {
