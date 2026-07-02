@@ -2,21 +2,10 @@ package top.foxball.nekobackend.service.impl
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import top.foxball.nekobackend.datasource.jdbc.PveUser
-import top.foxball.nekobackend.datasource.jdbc.PveUserRepository
-import top.foxball.nekobackend.datasource.jdbc.VirtualMachineStatus
-import top.foxball.nekobackend.datasource.jdbc.VirtualMachines
-import top.foxball.nekobackend.datasource.jdbc.VirtualMachinesRepository
+import top.foxball.nekobackend.datasource.jdbc.*
 import top.foxball.nekobackend.handlder.ParamErrorException
 import top.foxball.nekobackend.handlder.ResourceNotFoundException
-import top.foxball.nekobackend.service.PveManagementService
-import top.foxball.nekobackend.service.PveUserCreateRequest
-import top.foxball.nekobackend.service.PveUserResponse
-import top.foxball.nekobackend.service.PveUserUpdateRequest
-import top.foxball.nekobackend.service.VirtualMachineCreateRequest
-import top.foxball.nekobackend.service.VirtualMachineResponse
-import top.foxball.nekobackend.service.VirtualMachineStatusUpdateRequest
-import top.foxball.nekobackend.service.VirtualMachineUpdateRequest
+import top.foxball.nekobackend.service.*
 
 @Service
 class PveManagementServiceImpl(
@@ -60,7 +49,12 @@ class PveManagementServiceImpl(
         return pveUserRepository.findAll()
             .asSequence()
             .filter { userId == null || it.userId == userId }
-            .filter { normalizedUsername == null || it.username?.contains(normalizedUsername, ignoreCase = true) == true }
+            .filter {
+                normalizedUsername == null || it.username?.contains(
+                    normalizedUsername,
+                    ignoreCase = true
+                ) == true
+            }
             .filter { normalizedEmail == null || it.email?.equals(normalizedEmail, ignoreCase = true) == true }
             .filter { normalizedStatus == null || it.status?.equals(normalizedStatus, ignoreCase = true) == true }
             .filter { normalizedAddress == null || it.address?.contains(normalizedAddress, ignoreCase = true) == true }

@@ -163,9 +163,11 @@ class OkHttpService(
                 is Iterable<*> -> value
                     .filterNotNull()
                     .forEach { builder.addQueryParameter(name, it.toString()) }
+
                 is Array<*> -> value
                     .filterNotNull()
                     .forEach { builder.addQueryParameter(name, it.toString()) }
+
                 else -> builder.addQueryParameter(name, value.toString())
             }
         }

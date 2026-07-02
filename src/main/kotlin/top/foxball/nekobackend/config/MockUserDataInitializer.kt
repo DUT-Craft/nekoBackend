@@ -24,7 +24,7 @@ class MockUserDataInitializer(
             .map { index -> buildMockUser(index, now) }
             .filter { user ->
                 userRepository.findByUsername(user.username) == null &&
-                    userRepository.findByEmail(user.email) == null
+                        userRepository.findByEmail(user.email) == null
             }
 
         if (users.isNotEmpty()) {
@@ -55,7 +55,7 @@ class MockUserDataInitializer(
             isQQNumber = false,
             contactInformation = mutableListOf("mock_user_admin@example.com"),
         )
-        userRepository.save( admin)
+        userRepository.save(admin)
         println("已生成模拟管理用户：$admin")
     }
 

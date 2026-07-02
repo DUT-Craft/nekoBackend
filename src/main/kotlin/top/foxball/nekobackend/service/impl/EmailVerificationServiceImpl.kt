@@ -1,9 +1,9 @@
 package top.foxball.nekobackend.service.impl
 
+import org.slf4j.LoggerFactory
 import org.springframework.mail.MailException
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import top.foxball.nekobackend.config.EmailVerificationProperties
 import top.foxball.nekobackend.datasource.redis.EmailCode

@@ -42,7 +42,7 @@ class PveUser {
     var pam: String? = null
 
     /** PVE 账号绑定邮箱。 */
-    @Column(name = "email", length = 128,nullable = true)
+    @Column(name = "email", length = 128, nullable = true)
     var email: String? = null
 
     /** 创建时间戳。 */

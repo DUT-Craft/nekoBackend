@@ -26,8 +26,8 @@ class GroupAuthorizationService {
 
     private fun isAuthenticated(authentication: Authentication?): Boolean {
         return authentication != null &&
-            authentication.isAuthenticated &&
-            authentication !is AnonymousAuthenticationToken
+                authentication.isAuthenticated &&
+                authentication !is AnonymousAuthenticationToken
     }
 
     private fun normalizeRole(role: String): String? {

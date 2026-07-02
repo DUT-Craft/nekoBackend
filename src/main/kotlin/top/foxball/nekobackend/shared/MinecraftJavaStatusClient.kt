@@ -387,6 +387,7 @@ private fun flattenTextComponent(value: Any?): String {
             value.getString("text")?.let(::append)
             value["extra"]?.let { append(flattenTextComponent(it)) }
         }
+
         else -> value.toString()
     }
 }

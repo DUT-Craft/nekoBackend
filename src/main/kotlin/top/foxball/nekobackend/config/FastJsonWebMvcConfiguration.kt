@@ -41,7 +41,7 @@ class FastJsonWebMvcConfiguration : WebMvcConfigurer {
 
     override fun configureMessageConverters(builder: HttpMessageConverters.ServerBuilder) {
         builder.withJsonConverter(fastJson2HttpMessageConverter())
-            // Fallback converter for some usages
+        // Fallback converter for some usages
 //            .withJsonConverter(JacksonJsonHttpMessageConverter())
     }
 }

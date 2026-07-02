@@ -8,11 +8,7 @@ import top.foxball.nekobackend.datasource.jdbc.MinecraftJavaServerStatus
 import top.foxball.nekobackend.datasource.jdbc.MinecraftJavaServerType
 import top.foxball.nekobackend.handlder.ParamErrorException
 import top.foxball.nekobackend.handlder.ResourceNotFoundException
-import top.foxball.nekobackend.service.MinecraftJavaServerCreateRequest
-import top.foxball.nekobackend.service.MinecraftJavaServerResponse
-import top.foxball.nekobackend.service.MinecraftJavaServerService
-import top.foxball.nekobackend.service.MinecraftJavaServerStatusUpdateRequest
-import top.foxball.nekobackend.service.MinecraftJavaServerUpdateRequest
+import top.foxball.nekobackend.service.*
 import java.time.LocalDateTime
 
 @Service

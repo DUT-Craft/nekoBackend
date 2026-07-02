@@ -1,7 +1,6 @@
 package top.foxball.nekobackend.datasource.jdbc
 
 import jakarta.persistence.*
-import java.time.LocalDateTime
 
 @Entity
 @Table(

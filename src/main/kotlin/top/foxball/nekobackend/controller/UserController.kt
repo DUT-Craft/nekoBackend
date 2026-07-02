@@ -9,16 +9,10 @@ import top.foxball.nekobackend.handlder.ParamErrorException
 import top.foxball.nekobackend.handlder.UserAlreadyExistsException
 import top.foxball.nekobackend.handlder.UserNotFoundException
 import top.foxball.nekobackend.security.AuthPrincipal
-import top.foxball.nekobackend.service.EmailVerificationPurpose
-import top.foxball.nekobackend.service.EmailVerificationService
-import top.foxball.nekobackend.service.FileStorageService
-import top.foxball.nekobackend.service.FileUploadResponse
-import top.foxball.nekobackend.service.TagResponse
-import top.foxball.nekobackend.service.UserService
-import top.foxball.nekobackend.service.toTagResponses
+import top.foxball.nekobackend.service.*
 import top.foxball.nekobackend.shared.Response
 import top.foxball.nekobackend.shared.ResponseBuilder
-import java.util.Locale
+import java.util.*
 
 /**
  * 用户资料相关接口，负责公开用户资料查询、当前用户邮箱和个人资料维护。
@@ -37,7 +31,7 @@ class UserController(
     @GetMapping("userByUsername")
     fun getUserByUsername(
         @RequestParam username: String
-    ) : ResponseEntity<Response>{
+    ): ResponseEntity<Response> {
         val user = userService.findByUsername(username)
 
         data class Response(

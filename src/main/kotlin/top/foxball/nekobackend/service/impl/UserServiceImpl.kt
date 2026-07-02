@@ -14,21 +14,21 @@ import java.time.LocalDateTime
 class UserServiceImpl(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
-): UserService {
+) : UserService {
 
     override fun findByUsername(username: String): User? {
         return userRepository.findByUsername(username)
     }
 
-     override fun findByEmail(email: String): User? {
+    override fun findByEmail(email: String): User? {
         return userRepository.findByEmail(email)
     }
 
-     override fun save(user: User): User {
+    override fun save(user: User): User {
         return userRepository.save(user)
     }
 
-     override fun findById(id: Long): User? {
+    override fun findById(id: Long): User? {
         return userRepository.findById(id).orElse(null)
     }
 
@@ -44,16 +44,18 @@ class UserServiceImpl(
             throw UserAlreadyExistsException("邮箱已存在")
         }
 
-        return userRepository.save(User(
-            username = normalizedUsername,
-            password = passwordEncoder.encode(password)
-                ?: throw IllegalStateException("Password encoding failed."),
-            email = normalizedEmail,
-            nickname = normalizedUsername,
-            registerTime = LocalDateTime.now(),
-            status = Status.ACTIVE,
-            signature = "This is a signature.",
-            avatar = "https://cdn.jsdelivr.net/gh/sakuranoki/cdn/img/avatar/default.png",
-        ))
+        return userRepository.save(
+            User(
+                username = normalizedUsername,
+                password = passwordEncoder.encode(password)
+                    ?: throw IllegalStateException("Password encoding failed."),
+                email = normalizedEmail,
+                nickname = normalizedUsername,
+                registerTime = LocalDateTime.now(),
+                status = Status.ACTIVE,
+                signature = "This is a signature.",
+                avatar = "https://cdn.jsdelivr.net/gh/sakuranoki/cdn/img/avatar/default.png",
+            )
+        )
     }
 }

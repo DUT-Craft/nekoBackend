@@ -5,6 +5,9 @@ import top.foxball.nekobackend.datasource.jdbc.MinecraftJavaServerStatus
 import top.foxball.nekobackend.datasource.jdbc.MinecraftJavaServerType
 import java.time.LocalDateTime
 
+/**
+ * Minecraft Java 服务器创建请求。
+ */
 data class MinecraftJavaServerCreateRequest(
     val name: String = "",
     val description: String? = null,
@@ -22,6 +25,11 @@ data class MinecraftJavaServerCreateRequest(
     val remark: String? = null,
 )
 
+/**
+ * Minecraft Java 服务器更新请求。
+ *
+ * 空值字段表示不修改对应属性。
+ */
 data class MinecraftJavaServerUpdateRequest(
     val name: String? = null,
     val description: String? = null,
@@ -40,10 +48,16 @@ data class MinecraftJavaServerUpdateRequest(
     val remark: String? = null,
 )
 
+/**
+ * Minecraft Java 服务器状态更新请求。
+ */
 data class MinecraftJavaServerStatusUpdateRequest(
     val status: MinecraftJavaServerStatus,
 )
 
+/**
+ * Minecraft Java 服务器响应数据。
+ */
 data class MinecraftJavaServerResponse(
     val id: Long?,
     val userId: Long?,
@@ -66,10 +80,19 @@ data class MinecraftJavaServerResponse(
     val remark: String?,
 )
 
+/**
+ * Minecraft Java 服务器服务，负责当前用户服务器记录的创建、查询、更新和删除。
+ */
 @Service
 interface MinecraftJavaServerService {
+    /**
+     * 为用户创建 Minecraft Java 服务器记录。
+     */
     fun create(userId: Long, request: MinecraftJavaServerCreateRequest): MinecraftJavaServerResponse
 
+    /**
+     * 查询用户自己的服务器列表，可按版本、类型和状态过滤。
+     */
     fun findMine(
         userId: Long,
         version: String? = null,
@@ -77,15 +100,27 @@ interface MinecraftJavaServerService {
         status: MinecraftJavaServerStatus? = null,
     ): List<MinecraftJavaServerResponse>
 
+    /**
+     * 查询用户自己的指定服务器详情。
+     */
     fun findById(userId: Long, id: Long): MinecraftJavaServerResponse
 
+    /**
+     * 更新用户自己的指定服务器基础信息。
+     */
     fun update(userId: Long, id: Long, request: MinecraftJavaServerUpdateRequest): MinecraftJavaServerResponse
 
+    /**
+     * 更新用户自己的指定服务器状态，并刷新检查时间。
+     */
     fun updateStatus(
         userId: Long,
         id: Long,
         request: MinecraftJavaServerStatusUpdateRequest,
     ): MinecraftJavaServerResponse
 
+    /**
+     * 删除用户自己的指定服务器记录。
+     */
     fun delete(userId: Long, id: Long)
 }

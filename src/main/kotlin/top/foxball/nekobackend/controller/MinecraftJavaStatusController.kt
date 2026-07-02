@@ -6,12 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import top.foxball.nekobackend.handlder.ParamErrorException
-import top.foxball.nekobackend.shared.MinecraftJavaPlayerSample
-import top.foxball.nekobackend.shared.MinecraftJavaServerStatus
-import top.foxball.nekobackend.shared.MinecraftJavaStatusClient
-import top.foxball.nekobackend.shared.SrvRecord
-import top.foxball.nekobackend.shared.Response
-import top.foxball.nekobackend.shared.ResponseBuilder
+import top.foxball.nekobackend.shared.*
 import java.io.IOException
 
 data class MinecraftJavaStatusQueryResponse(
